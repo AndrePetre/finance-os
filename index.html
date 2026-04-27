@@ -238,6 +238,18 @@ function liveUpdate() {
   set('live-prelevati', '- '+fmt(p.prelevati));
   set('live-spese-det', '- '+fmt(p.speseTot));
   set('live-pat-bottom', fmt(p.tot));
+  // Update category totals
+  Object.keys(md.spese||{}).forEach(function(cat) {
+    var tot = Object.keys(md.spese[cat]||{}).reduce(function(s,v){ return s+(parseFloat(md.spese[cat][v])||0); },0);
+    var node = el('cat-tot-'+cat);
+    if (node) {
+      node.textContent = fmt(tot);
+      node.style.color = tot>0?'var(--gold)':'var(--muted)';
+    }
+  });
+  // Viaggi total
+  var totV = (md.viaggi||[]).reduce(function(s,v){ return s+(parseFloat(v.costo)||0); },0);
+  set('cat-tot-viaggi', fmt(totV));
 }
 
 // ── MUTATORS ──────────────────────────────────────────────────────────────────
@@ -478,7 +490,8 @@ function renderMese() {
   }
 
   // Altri conti
-  var altriConti = conti.filter(function(c){ return !c.principale; });
+  var cpNome = cp ? cp.nome : '';
+  var altriConti = conti.filter(function(c){ return !c.principale && c.nome !== cpNome; });
   if (altriConti.length) {
     html += '<div class="card"><div class="card-title">🏦 Altri Conti</div>';
     altriConti.forEach(function(c){
@@ -506,7 +519,7 @@ function renderMese() {
     html += '<div class="card">'
       +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
       +'<div class="card-title" style="margin-bottom:0">'+label+'</div>'
-      +'<div class="mono" style="font-size:12px;color:'+(tot>0?'var(--gold)':'var(--muted)')+'">'+fmt(tot)+'</div>'
+      +'<div class="mono" style="font-size:12px;color:'+(tot>0?'var(--gold)':'var(--muted)')+'" id="cat-tot-'+cat+'">'+fmt(tot)+'</div>'
       +'</div>';
     voci.forEach(function(v){
       html += '<div class="row"><div class="row-label">'+h(v)+'</div>'
@@ -524,7 +537,7 @@ function renderMese() {
     html += '<div class="card">'
       +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
       +'<div class="card-title" style="margin-bottom:0">👤 '+h(membro)+' — Personale</div>'
-      +'<div class="mono" style="font-size:12px;color:'+(tot>0?'var(--gold)':'var(--muted)')+'">'+fmt(tot)+'</div>'
+      +'<div class="mono" style="font-size:12px;color:'+(tot>0?'var(--gold)':'var(--muted)')+'" id="cat-tot-'+cat+'">'+fmt(tot)+'</div>'
       +'</div>';
     voci.forEach(function(v){
       html += '<div class="row"><div class="row-label">'+h(v)+'</div>'
@@ -540,7 +553,7 @@ function renderMese() {
   html += '<div class="card">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
     +'<div class="card-title" style="margin-bottom:0">✈️ Viaggi</div>'
-    +'<div class="mono" style="font-size:12px;color:'+(totV>0?'var(--gold)':'var(--muted)')+'">'+fmt(totV)+'</div>'
+    +'<div class="mono" style="font-size:12px;color:'+(totV>0?'var(--gold)':'var(--muted)')+'" id="cat-tot-viaggi">'+fmt(totV)+'</div>'
     +'</div>';
   (md.viaggi||[]).forEach(function(v,i){
     html += '<div style="display:grid;grid-template-columns:1fr 95px 34px;gap:6px;margin-bottom:6px;align-items:center">'
