@@ -466,8 +466,8 @@ function renderMese() {
     </div>
   </div>`;
 
-  // Altri conti
-  conti.filter(c=>!c.principale).forEach(c => {
+  // Altri conti (escludi principale per nome E per flag)
+  conti.filter(c=>!c.principale && c.nome !== (contoPrincipale?.nome||'')).forEach(c => {
     html += `<div style="display:grid;grid-template-columns:auto 1fr 100px;gap:8px;margin-bottom:10px;align-items:center">
       <div style="width:10px;height:10px;border-radius:50%;background:${c.colore};flex-shrink:0"></div>
       <div style="font-size:13px;color:var(--dim)">${c.nome}</div>
