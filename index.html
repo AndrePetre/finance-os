@@ -101,7 +101,7 @@ var S={
   view:'loading',auth:'login',
   user:null,profile:null,
   tab:'mese',
-  mk:(function(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');})(),
+  mk:'2026-01',
   mesi:{},err:'',loading:false,
   step:1,
   setup:{membri:[''],conti:[{nome:'Revolut',col:'#60a5fa',main:true},{nome:'Trade Republic',col:'#fbbf24',main:false},{nome:'IsyBank',col:'#a78bfa',main:false}]},
@@ -320,10 +320,39 @@ function addV(el_){
   inp1.focus();
 }
 
+
+// ── PROPAGATE TO FUTURE MONTHS ────────────────────────────────────────────
+// When sezioni structure changes in current month, apply to all future months
+// (future = months after S.mk that exist in S.mesi)
+// We copy the structure (names, order, emojis) but preserve their existing values
+function propagateFuture(){
+  var md=getMD(S.mk);
+  var futureKeys=Object.keys(S.mesi).filter(function(k){return k>S.mk;}).sort();
+  futureKeys.forEach(function(k){
+    var future=S.mesi[k];
+    if(!future)return;
+    // Build new sezioni matching current month's structure
+    var newSez=md.sezioni.map(function(s){
+      // Find existing section in future month to preserve its values
+      var existing=future.sezioni?future.sezioni.find(function(fs){return fs.nome===s.nome;}):null;
+      var voci={};
+      Object.keys(s.voci||{}).forEach(function(v){
+        // Preserve existing value if present, otherwise empty
+        voci[v]=(existing&&existing.voci&&existing.voci[v]!==undefined)?existing.voci[v]:'';
+      });
+      return{nome:s.nome,em:s.em,voci:voci};
+    });
+    future.sezioni=newSez;
+    // Save future month to Supabase
+    sb.from('mesi').upsert({user_id:S.user.id,mese_key:k,dati:future,updated_at:new Date().toISOString()},{onConflict:'user_id,mese_key'}).then(function(){});
+  });
+}
+
 function delS(el_){
   var md=getMD(S.mk);
   var i=parseInt(el_.dataset.i);
   md.sezioni.splice(i,1);
+  propagateFuture();
   save();reloadContent();
 }
 
@@ -339,6 +368,8 @@ function addS(){
   }
   md.sezioni.push({nome:nome,em:'📌',voci:{}});
   inp.value='';
+  propagateFuture();
+  propagateFuture();
   save();reloadContent();
 }
 
@@ -347,6 +378,8 @@ function moveSez(from,to){
   var md=getMD(S.mk);
   var item=md.sezioni.splice(from,1)[0];
   md.sezioni.splice(to,0,item);
+  propagateFuture();
+  propagateFuture();
   save();reloadContent();
 }
 
