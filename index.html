@@ -229,7 +229,7 @@ function lu(){
   var r=calcAll(md);
   function sv(id,txt,col){var n=el(id);if(!n)return;n.textContent=txt;if(col)n.style.color=col;}
   sv('lu0',fmt(r.pat),r.pat>=0?'var(--accent)':'var(--red)');
-  sv('lu1',fmt(r.spese));
+  sv('lu1',fmt(r.spese+r.prel));
   sv('lu2',fmt(r.saldo),r.saldo>=0?'var(--accent)':'var(--red)');
   sv('lu3','+ '+fmt(r.stip));
   sv('lu4','- '+fmt(r.prel));
@@ -686,7 +686,7 @@ function renderMese(){
 
   // Stats
   h+='<div class="stat-row">'
-    +'<div class="stat"><div class="sl">Spese</div><div class="sv" style="color:var(--red)" id="lu1">'+fmt(r.spese)+'</div></div>'
+    +'<div class="stat"><div class="sl">Uscite</div><div class="sv" style="color:var(--red)" id="lu1">'+fmt(r.spese+r.prel)+'</div></div>'
     +'<div class="stat"><div class="sl">💎 Patrimonio</div><div class="sv" id="lu0" style="color:'+(r.pat>=0?'var(--accent)':'var(--red)')+'">'+fmt(r.pat)+'</div></div>'
     +'</div>';
 
@@ -918,7 +918,7 @@ function renderStorico(){
       +'<div class="mono" style="color:'+(r.pat>=0?'var(--accent)':'var(--red)')+';font-size:14px;font-weight:600">'+fmt(r.pat)+'</div>'
       +'</div>'
       +'<div class="stat-row">'
-      +'<div class="stat"><div class="sl">Spese</div><div class="sv" style="color:var(--red)">'+fmt(r.spese)+'</div></div>'
+      +'<div class="stat"><div class="sl">Uscite</div><div class="sv" style="color:var(--red)">'+fmt(r.spese+r.prel)+'</div></div>'
       +'<div class="stat"><div class="sl">Patrimonio</div><div class="sv" style="color:var(--accent)">'+fmt(r.pat)+'</div></div>'
       +'</div></div>';
   });
