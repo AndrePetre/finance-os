@@ -5,8 +5,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Finance OS">
 <meta name="theme-color" content="#080c17">
+<link id="manifest-link" rel="manifest">
+<link id="apple-icon" rel="apple-touch-icon">
 <title>Finance OS</title>
+<script>
+// Generate SVG icon as data URL
+var svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="100" fill="#080c17"/><rect x="40" y="40" width="432" height="432" rx="80" fill="#0f1729"/><text x="256" y="340" font-size="260" text-anchor="middle" font-family="serif">💰</text></svg>';
+var svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgIcon);
+
+// Create PNG icon via canvas for better compatibility
+var canvas = document.createElement('canvas');
+canvas.width = 512; canvas.height = 512;
+var ctx = canvas.getContext('2d');
+var img = new Image();
+img.onload = function() {
+  ctx.drawImage(img, 0, 0, 512, 512);
+  var pngUrl = canvas.toDataURL('image/png');
+  // Set apple touch icon
+  document.getElementById('apple-icon').href = pngUrl;
+  // Create and set manifest
+  var manifest = {
+    name: 'Finance OS',
+    short_name: 'Finance OS',
+    description: 'Gestione finanze personali',
+    start_url: '/',
+    display: 'standalone',
+    background_color: '#080c17',
+    theme_color: '#00e5a0',
+    orientation: 'portrait',
+    icons: [
+      {src: pngUrl, sizes: '192x192', type: 'image/png'},
+      {src: pngUrl, sizes: '512x512', type: 'image/png', purpose: 'any maskable'}
+    ]
+  };
+  var blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+  document.getElementById('manifest-link').href = URL.createObjectURL(blob);
+};
+img.src = svgUrl;
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
