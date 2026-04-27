@@ -140,7 +140,7 @@ var S={
   view:'loading',auth:'login',
   user:null,profile:null,
   tab:'mese',
-  mk:'2026-01',
+  mk:(function(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');})(),
   mesi:{},err:'',loading:false,
   step:1,
   setup:{membri:[''],conti:[{nome:'Revolut',col:'#60a5fa',main:true},{nome:'Trade Republic',col:'#fbbf24',main:false},{nome:'IsyBank',col:'#a78bfa',main:false}]},
