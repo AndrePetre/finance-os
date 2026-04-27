@@ -128,12 +128,20 @@ function buildSezioni(profile){
 
 // ── MESE DATA ─────────────────────────────────────────────────────────────
 function tplSezioni(key){
+  // Inherit sezioni NAMES and ORDER from most recent past month
+  // but always use DEFAULT voci (don't copy custom added voci)
   var keys=Object.keys(S.mesi).sort().filter(function(k){return k<key;});
   if(keys.length){
     var last=S.mesi[keys[keys.length-1]];
     if(last&&last.sezioni&&last.sezioni.length){
+      // Get default voci map
+      var defMap={};
+      DEF_SEZ.forEach(function(s){defMap[s.nome]=s.voci||[];});
       return last.sezioni.map(function(s){
-        var v={};Object.keys(s.voci||{}).forEach(function(n){v[n]='';});
+        // For default sections: use default voci
+        // For custom/member sections: empty voci
+        var defVoci=defMap[s.nome]||[];
+        var v={};defVoci.forEach(function(n){v[n]='';});
         return {nome:s.nome,em:s.em,voci:v};
       });
     }
@@ -168,6 +176,7 @@ function calcAll(md){
   var cpn=cp.nome;
   var inizio=parseFloat(md.conti[cpn+'__i'])||0;
   var stip=0;membri.forEach(function(m){stip+=parseFloat(md.conti[cpn+'__s__'+m])||0;});
+  stip+=parseFloat(md.conti[cpn+'__ae'])||0;
   var prel=0;membri.forEach(function(m){prel+=parseFloat(md.conti[cpn+'__p__'+m])||0;});
   var spese=calcSpese(md);
   var saldo=inizio+stip-prel-spese;
@@ -332,12 +341,16 @@ function propagateFuture(){
     var future=S.mesi[k];
     if(!future)return;
     // Build new sezioni matching current month's structure
+    // Get default voci map
+    var defMap={};DEF_SEZ.forEach(function(s){defMap[s.nome]=s.voci||[];});
     var newSez=md.sezioni.map(function(s){
-      // Find existing section in future month to preserve its values
+      // Find existing section in future month to preserve its VALUES
       var existing=future.sezioni?future.sezioni.find(function(fs){return fs.nome===s.nome;}):null;
+      // Use default voci names (not custom ones from current month)
+      var defVoci=defMap[s.nome]||[];
       var voci={};
-      Object.keys(s.voci||{}).forEach(function(v){
-        // Preserve existing value if present, otherwise empty
+      defVoci.forEach(function(v){
+        // Preserve existing value if present
         voci[v]=(existing&&existing.voci&&existing.voci[v]!==undefined)?existing.voci[v]:'';
       });
       return{nome:s.nome,em:s.em,voci:voci};
@@ -651,6 +664,8 @@ function renderMese(){
       h+='<div class="row2"><div class="rl">💼 Stipendio '+esc(m)+'</div>'
         +'<input type="number" id="cs__'+esc(m)+'" value="'+esc(md.conti[ks]||'')+'" placeholder="0"></div>';
     });
+    h+='<div class="row2"><div class="rl">💵 Altre entrate</div>'
+      +'<input type="number" id="cae" value="'+esc(md.conti[cpn+'__ae']||'')+'" placeholder="0"></div>';
     membri.forEach(function(m){
       var kp=cpn+'__p__'+m;
       h+='<div class="row2"><div class="rl">💸 Prelevati '+esc(m)+'</div>'
@@ -757,6 +772,9 @@ function attachMeseListeners(){
   if(el('ci'))el('ci').oninput=function(){
     md.conti[cpn+'__i']=this.value;lu();save();
   };
+  if(el('cae'))el('cae').oninput=function(){
+    md.conti[cpn+'__ae']=this.value;lu();save();
+  };
   membri.forEach(function(m){
     var es=el('cs__'+m);
     if(es)es.oninput=function(){md.conti[cpn+'__s__'+m]=this.value;lu();save();};
@@ -824,7 +842,15 @@ function attachMeseListeners(){
 
 // ── RENDER STORICO ────────────────────────────────────────────────────────
 function renderStorico(){
-  var entries=Object.keys(S.mesi).sort().reverse().map(function(k){return{key:k,md:S.mesi[k]};});
+  var allEntries=Object.keys(S.mesi).sort().reverse().map(function(k){return{key:k,md:S.mesi[k]};});
+  // Hide months where patrimonio is 0 and no data entered
+  var entries=allEntries.filter(function(e){
+    var r=calcAll(e.md);
+    var hasConti=Object.values(e.md.conti||{}).some(function(v){return parseFloat(v)!==0&&v!=='';});
+    var hasSpese=e.md.sezioni&&e.md.sezioni.some(function(s){return Object.values(s.voci||{}).some(function(v){return parseFloat(v)!==0&&v!=='';});});
+    var hasViaggi=e.md.viaggi&&e.md.viaggi.some(function(v){return parseFloat(v.costo)!==0;});
+    return hasConti||hasSpese||hasViaggi;
+  });
   var h='';
   if(!entries.length)return'<div style="text-align:center;padding:60px;color:var(--muted)">Nessun dato.<br>Inizia dal tab Mese!</div>';
 
