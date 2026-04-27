@@ -174,7 +174,7 @@ function renderAuth() {
   return `<div class="auth-wrap fade">
     <div class="auth-card">
       <div class="auth-logo">
-        <div class="logo-icon" style="width:56px;height:56px;font-size:26px;margin:0 auto 10px;background:linear-gradient(135deg,var(--accent),#00b8d4);border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px var(--accentg)">💰</div>
+        <div style="width:72px;height:72px;font-size:40px;margin:0 auto 12px;background:linear-gradient(135deg,var(--accent),#00b8d4);border-radius:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 24px var(--accentg);text-align:center;line-height:1">💰</div>
         <div class="auth-title">Finance OS</div>
         <div class="auth-sub">${isLogin ? 'Accedi al tuo account' : 'Crea il tuo account'}</div>
       </div>
@@ -247,7 +247,7 @@ function renderSetup() {
   const step = state.setupStep;
   return `<div class="setup-wrap fade">
     <div style="text-align:center">
-      <div class="logo-icon" style="width:48px;height:48px;font-size:22px;margin:0 auto 12px;background:linear-gradient(135deg,var(--accent),#00b8d4);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px var(--accentg)">💰</div>
+      <div style="width:64px;height:64px;font-size:36px;margin:0 auto 12px;background:linear-gradient(135deg,var(--accent),#00b8d4);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px var(--accentg);text-align:center;line-height:1">💰</div>
       <div style="font-weight:700;font-size:20px">Configura il tuo profilo</div>
       <div style="font-size:13px;color:var(--dim);margin-top:4px">Step ${step} di 2</div>
     </div>
@@ -263,7 +263,7 @@ function renderSetup() {
       <div id="membri-list">
         ${s.membri.map((m,i) => `
           <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-            <input value="${m}" placeholder="Es: Andrea" oninput="updateMembro(${i},this.value)" style="flex:1">
+            <input value="${m}" placeholder="Es: Andrea" id="membro-${i}" onblur="updateMembro(${i},this.value)" style="flex:1">
             ${s.membri.length > 1 ? `<button class="del-btn" onclick="removeMembro(${i})">×</button>` : ''}
           </div>`).join('')}
       </div>
