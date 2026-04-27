@@ -293,16 +293,52 @@ function setVoce(sezIdx,voce,val){
 function addVoce(sezIdx){
   var md=getMD(S.meseKey);
   var sez=md.sezioni[sezIdx];
-  var n='Voce '+(Object.keys(sez.voci||{}).length+1);
   if(!sez.voci) sez.voci={};
+  var n='Voce '+(Object.keys(sez.voci).length+1);
   sez.voci[n]='';
-  scheduleSave();render();
+  scheduleSave();
+  // Append row to DOM without full re-render
+  var container=el('voci-'+sezIdx);
+  if(!container){render();return;}
+  var voceIdx=Object.keys(sez.voci).length-1;
+  var div=document.createElement('div');
+  div.className='row3';
+  div.setAttribute('data-sez',sezIdx);
+  div.setAttribute('data-voce',n);
+  div.innerHTML='<input value="" placeholder="Nome voce" class="voce-name" data-idx="'+sezIdx+'" data-voce="'+n+'" onblur="renameVoce(parseInt(this.dataset.idx),this.dataset.voce,this.value)" style="text-align:left">'
+    +'<input type="number" value="" placeholder="0" data-idx="'+sezIdx+'" data-voce="'+n+'" oninput="setVoce(parseInt(this.dataset.idx),this.dataset.voce,this.value)">'
+    +'<button class="del-btn" data-idx="'+sezIdx+'" data-voce="'+n+'" onclick="rmVoce(parseInt(this.dataset.idx),this.dataset.voce)">&#xD7;</button>';
+  container.appendChild(div);
+  // Focus the name input
+  div.querySelector('input').focus();
 }
 
 function rmVoce(sezIdx,voce){
   var md=getMD(S.meseKey);
   delete md.sezioni[sezIdx].voci[voce];
   liveUpdate();scheduleSave();render();
+}
+
+function renameVoce(sezIdx,oldName,newName){
+  if(!newName||!newName.trim()||newName.trim()===oldName) return;
+  newName=newName.trim();
+  var md=getMD(S.meseKey);
+  var voci=md.sezioni[sezIdx].voci;
+  if(!voci) return;
+  // Check duplicate
+  if(voci[newName]!==undefined){
+    // revert input
+    var inputs=document.querySelectorAll('[data-voce="'+oldName+'"][data-idx="'+sezIdx+'"].voce-name');
+    inputs.forEach(function(inp){inp.value=oldName;});
+    return;
+  }
+  var val=voci[oldName];
+  delete voci[oldName];
+  voci[newName]=val||'';
+  // Update all data-voce references in DOM for this voce
+  var allEl=document.querySelectorAll('[data-voce="'+oldName+'"][data-idx="'+sezIdx+'"]');
+  allEl.forEach(function(node){node.setAttribute('data-voce',newName);});
+  scheduleSave();
 }
 
 function rmSezione(sezIdx){
@@ -561,13 +597,15 @@ function renderMese(){
       +'<div class="mono" style="font-size:12px;color:'+(tot>0?'var(--gold)':'var(--muted)')+'" id="ct-'+i+'">'+fmt(tot)+'</div>'
       +'<button data-idx="'+i+'" onclick="rmSezione(parseInt(this.dataset.idx))" style="background:transparent;color:var(--muted);border:none;font-size:18px;line-height:1;padding:0 2px" title="Rimuovi sezione">&#x2715;</button>'
       +'</div></div>';
+    html+='<div id="voci-'+i+'">';
     voci.forEach(function(v){
-      html+='<div class="row3">'
-        +'<div class="row-label">'+esc(v)+'</div>'
+      html+='<div class="row3" data-sez="'+i+'" data-voce="'+esc(v)+'">'
+        +'<input value="'+esc(v)+'" placeholder="Nome voce" class="voce-name" data-idx="'+i+'" data-voce="'+esc(v)+'" onblur="renameVoce(parseInt(this.dataset.idx),this.dataset.voce,this.value)" style="text-align:left;color:var(--dim);font-size:13px;padding:8px 10px">'
         +'<input type="number" value="'+esc(sez.voci[v]||'')+'" placeholder="0" data-idx="'+i+'" data-voce="'+esc(v)+'" oninput="setVoce(parseInt(this.dataset.idx),this.dataset.voce,this.value)">'
         +'<button class="del-btn" data-idx="'+i+'" data-voce="'+esc(v)+'" onclick="rmVoce(parseInt(this.dataset.idx),this.dataset.voce)">&#xD7;</button>'
         +'</div>';
     });
+    html+='</div>';
     html+='<button class="add-btn" data-idx="'+i+'" onclick="addVoce(parseInt(this.dataset.idx))">+ Aggiungi voce</button>';
     html+='</div>';
   });
