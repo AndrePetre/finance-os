@@ -21,7 +21,8 @@ html,body{height:100%;overflow:hidden;}
 body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--cardb);border-radius:2px}
 input,textarea{background:#090e1c;border:1px solid var(--cardb);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:15px;border-radius:10px;padding:10px 12px;width:100%;outline:none;transition:border 0.2s;-webkit-appearance:none;}
-input[type=number]{font-family:'JetBrains Mono',monospace;text-align:right;}
+input[type=number]{font-family:'JetBrains Mono',monospace;text-align:right;-moz-appearance:textfield;}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accentg);}
 input::placeholder{color:var(--muted);}
 button{cursor:pointer;font-family:'Space Grotesk',sans-serif;font-weight:600;transition:all 0.15s;border:none;}
@@ -127,7 +128,7 @@ function emptyMese() {
   Object.keys(cats).forEach(function(cat){ spese[cat]={}; (cats[cat]||[]).forEach(function(v){ spese[cat][v]=''; }); });
   var membri = S.profile ? (S.profile.membri||[]) : [];
   membri.forEach(function(m){ if(!spese[m]) spese[m]={}; });
-  return { conti:{}, spese:spese, viaggi:[], note:'' };
+  return { conti:{}, spese:spese, viaggi:[], note:'', sezioni:{} };
 }
 
 function getMD(key) {
@@ -149,6 +150,11 @@ function calcSpese(md) {
     Object.keys(obj).forEach(function(v){ tot += parseFloat(obj[v])||0; });
   });
   (md.viaggi||[]).forEach(function(v){ tot += parseFloat(v.costo)||0; });
+  Object.keys(md.sezioni||{}).forEach(function(sez){
+    var obj = md.sezioni[sez];
+    if(!obj || typeof obj !== 'object') return;
+    Object.keys(obj).forEach(function(v){ tot += parseFloat(obj[v])||0; });
+  });
   return tot;
 }
 
@@ -209,6 +215,7 @@ function sanitizeMD(d) {
   if (!d.spese) d.spese = {};
   if (!d.viaggi) d.viaggi = [];
   if (!d.note) d.note = '';
+  if (!d.sezioni) d.sezioni = {};
   return d;
 }
 
@@ -254,6 +261,47 @@ function setSpesa(cat, v, val){ var md=getMD(S.meseKey); if(!md.spese[cat])md.sp
 function setNote(val){ getMD(S.meseKey).note=val; scheduleSave(); }
 function setViaggio(i, field, val){ getMD(S.meseKey).viaggi[i][field]=val; liveUpdate(); scheduleSave(); }
 function addViaggio(){ getMD(S.meseKey).viaggi.push({nome:'',costo:''}); render(); }
+
+function addSezione(){
+  var nome = prompt('Nome della sezione (es: Matrimonio, Casa Nuova...):');
+  if(!nome || !nome.trim()) return;
+  nome = nome.trim();
+  var md = getMD(S.meseKey);
+  if(!md.sezioni) md.sezioni = {};
+  if(md.sezioni[nome]){ alert('Sezione già esistente!'); return; }
+  md.sezioni[nome] = {};
+  scheduleSave(); render();
+}
+
+function rmSezione(nome){
+  if(!confirm('Rimuovere la sezione "'+nome+'" e tutte le sue voci?')) return;
+  var md = getMD(S.meseKey);
+  if(md.sezioni) delete md.sezioni[nome];
+  scheduleSave(); render();
+}
+
+function addVoceSezione(nome){
+  var md = getMD(S.meseKey);
+  if(!md.sezioni) md.sezioni = {};
+  if(!md.sezioni[nome]) md.sezioni[nome] = {};
+  var n = 'Voce '+(Object.keys(md.sezioni[nome]).length+1);
+  md.sezioni[nome][n] = '';
+  scheduleSave(); render();
+}
+
+function rmVoceSezione(nome, voce){
+  var md = getMD(S.meseKey);
+  if(md.sezioni && md.sezioni[nome]) delete md.sezioni[nome][voce];
+  liveUpdate(); scheduleSave(); render();
+}
+
+function setVoceSezione(nome, voce, val){
+  var md = getMD(S.meseKey);
+  if(!md.sezioni) md.sezioni = {};
+  if(!md.sezioni[nome]) md.sezioni[nome] = {};
+  md.sezioni[nome][voce] = val;
+  liveUpdate(); scheduleSave();
+}
 function rmViaggio(i){ getMD(S.meseKey).viaggi.splice(i,1); liveUpdate(); scheduleSave(); render(); }
 
 function addVoce(cat) {
@@ -525,6 +573,29 @@ function renderMese(){
     html+='<button class="add-btn" onclick="addVoce(\''+qq(membro)+'\')">+ Aggiungi voce</button></div>';
   });
 
+  // Sezioni personalizzate
+  Object.keys(md.sezioni||{}).forEach(function(sez){
+    var sezData = md.sezioni[sez]||{};
+    var voci = Object.keys(sezData);
+    var tot = voci.reduce(function(s,v){ return s+(parseFloat(sezData[v])||0); },0);
+    var sezId = 'sez-'+encodeURIComponent(sez);
+    html+='<div class="card" style="border-color:var(--purple)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+      +'<div class="card-title" style="margin-bottom:0;color:var(--purple)">&#10024; '+esc(sez)+'</div>'
+      +'<div style="display:flex;align-items:center;gap:10px">'
+      +'<div class="mono" style="font-size:12px;color:'+(tot>0?'var(--gold)':'var(--muted)')+'" id="ct-'+sezId+'">'+fmt(tot)+'</div>'
+      +'<button data-sez="'+esc(sez)+'" onclick="rmSezione(this.dataset.sez)" style="background:transparent;color:var(--red);border:1px solid var(--red);border-radius:6px;font-size:11px;padding:2px 8px">Rimuovi</button>'
+      +'</div></div>';
+    voci.forEach(function(v){
+      html+='<div class="row3">'
+        +'<div class="row-label">'+esc(v)+'</div>'
+        +'<input type="number" value="'+esc(sezData[v]||'')+'" placeholder="0" data-sez="'+esc(sez)+'" data-voce="'+esc(v)+'" oninput="setVoceSezione(this.dataset.sez,this.dataset.voce,this.value)">'
+        +'<button class="del-btn" data-sez="'+esc(sez)+'" data-voce="'+esc(v)+'" onclick="rmVoceSezione(this.dataset.sez,this.dataset.voce)">&#215;</button>'
+        +'</div>';
+    });
+    html+='<button class="add-btn" style="border-color:var(--purple);color:var(--purple)" data-sez="'+esc(sez)+'" onclick="addVoceSezione(this.dataset.sez)">+ Aggiungi voce</button></div>';
+  });
+
   // Viaggi
   var totV=(md.viaggi||[]).reduce(function(s,v){ return s+(parseFloat(v.costo)||0); },0);
   html+='<div class="card">'
@@ -540,6 +611,9 @@ function renderMese(){
       +'</div>';
   });
   html+='<button class="add-btn" onclick="addViaggio()">+ Aggiungi viaggio</button></div>';
+
+  // Aggiungi sezione button
+  html+='<button onclick="addSezione()" style="width:100%;padding:14px;border-radius:12px;background:transparent;border:2px dashed var(--purple);color:var(--purple);font-size:14px;font-weight:700;margin-bottom:12px">✨ Aggiungi sezione personalizzata</button>';
 
   // Note
   html+='<div class="card"><div class="card-title">📝 Note</div>'
