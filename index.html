@@ -5,49 +5,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#080c17">
 <title>Finance OS</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 :root {
-  --bg: #080c17; --card: #0f1729; --cardb: #1a2540;
-  --accent: #00e5a0; --accentd: #004d35; --accentg: rgba(0,229,160,0.12);
-  --gold: #fbbf24; --red: #f87171; --blue: #60a5fa; --purple: #a78bfa;
-  --text: #eef2ff; --dim: #8892aa; --muted: #3a4460;
+  --bg:#080c17;--card:#0f1729;--cardb:#1a2540;
+  --accent:#00e5a0;--accentd:#004d35;--accentg:rgba(0,229,160,0.12);
+  --gold:#fbbf24;--red:#f87171;--blue:#60a5fa;--purple:#a78bfa;
+  --text:#eef2ff;--dim:#8892aa;--muted:#3a4460;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;}
-body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:15px;}
-::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--cardb);border-radius:2px}
-.mono{font-family:'JetBrains Mono',monospace;}
-input,textarea,select{background:#090e1c;border:1px solid var(--cardb);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:15px;border-radius:10px;padding:12px 14px;width:100%;outline:none;transition:all 0.2s;-webkit-appearance:none;appearance:none;}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--cardb);border-radius:2px}
+input,textarea,select{background:#090e1c;border:1px solid var(--cardb);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:15px;border-radius:10px;padding:10px 12px;width:100%;outline:none;transition:border 0.2s;-webkit-appearance:none;}
 input[type=number]{font-family:'JetBrains Mono',monospace;text-align:right;}
-input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accentg);}
-input::placeholder,textarea::placeholder{color:var(--muted);}
-button{cursor:pointer;font-family:'Space Grotesk',sans-serif;font-weight:600;transition:all 0.15s;border:none;font-size:15px;}
+input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accentg);}
+input::placeholder{color:var(--muted);}
+button{cursor:pointer;font-family:'Space Grotesk',sans-serif;font-weight:600;transition:all 0.15s;border:none;}
 button:active{opacity:0.8;transform:scale(0.97);}
+.mono{font-family:'JetBrains Mono',monospace;}
 .fade{animation:fade 0.3s ease forwards;}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-.spin{animation:spin 0.8s linear infinite;}
 
 /* LAYOUT */
 #app{display:flex;flex-direction:column;height:100vh;height:100dvh;}
-#header{background:rgba(8,12,23,0.97);border-bottom:1px solid var(--cardb);padding:12px 16px;flex-shrink:0;backdrop-filter:blur(12px);}
+#header{background:rgba(8,12,23,0.97);border-bottom:1px solid var(--cardb);padding:12px 16px;flex-shrink:0;}
+#content{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch;}
+#nav{display:flex;background:rgba(8,12,23,0.97);border-top:1px solid var(--cardb);flex-shrink:0;}
+.nav-btn{flex:1;padding:10px 4px 12px;background:transparent;color:var(--dim);border:none;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.nav-btn.active{color:var(--accent);}
+.nav-icon{font-size:22px;}
+.nav-label{font-size:10px;font-weight:600;letter-spacing:0.5px;}
 .header-inner{display:flex;justify-content:space-between;align-items:center;}
 .logo{display:flex;align-items:center;gap:10px;}
-.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),#00b8d4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 14px var(--accentg);}
-.logo-text{font-weight:700;font-size:18px;letter-spacing:-0.5px;}
-.logo-sub{font-size:10px;color:var(--muted);letter-spacing:0.5px;}
-#content{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch;}
-#nav{display:flex;background:rgba(8,12,23,0.97);border-top:1px solid var(--cardb);flex-shrink:0;backdrop-filter:blur(12px);}
-.nav-btn{flex:1;padding:10px 4px 12px;background:transparent;color:var(--dim);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;}
-.nav-btn.active{color:var(--accent);}
-.nav-btn .nav-icon{font-size:22px;}
-.nav-btn .nav-label{font-size:10px;font-weight:600;letter-spacing:0.5px;}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),#00b8d4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.logo-text{font-weight:700;font-size:18px;}
+.logo-sub{font-size:10px;color:var(--muted);}
 
 /* CARDS */
 .card{background:var(--card);border:1px solid var(--cardb);border-radius:14px;padding:16px;margin-bottom:12px;}
@@ -55,25 +52,20 @@ button:active{opacity:0.8;transform:scale(0.97);}
 .card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--accent);margin-bottom:12px;}
 
 /* STATS */
-.stat-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
-.stat{background:#090e1c;border-radius:10px;padding:12px;border:1px solid var(--cardb);flex:1;min-width:120px;}
+.stat-row{display:flex;gap:8px;margin-bottom:10px;}
+.stat{background:#090e1c;border-radius:10px;padding:12px;border:1px solid var(--cardb);flex:1;}
 .stat-label{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:5px;}
 .stat-value{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:500;}
 
-/* FORM ROWS */
-.row{display:grid;grid-template-columns:1fr 100px;gap:8px;margin-bottom:8px;align-items:center;}
-.row-label{font-size:13px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* FORM */
+.row{display:grid;grid-template-columns:1fr 105px;gap:8px;margin-bottom:8px;align-items:center;}
+.row-label{font-size:13px;color:var(--dim);}
 .divider{height:1px;background:var(--cardb);margin:10px 0;}
-.total-row{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--cardb);}
-
-/* BUTTONS */
-.btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:16px;font-weight:700;text-align:center;letter-spacing:0.3px;}
+.btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:16px;font-weight:700;text-align:center;}
 .btn-primary{background:var(--accent);color:#000;}
 .btn-secondary{background:transparent;color:var(--accent);border:1px solid var(--accent);}
-.btn-danger{background:transparent;color:var(--red);border:1px solid var(--red);}
-.btn-sm{padding:7px 14px;border-radius:8px;font-size:13px;}
 .add-btn{background:transparent;border:1px dashed var(--accent);color:var(--accent);border-radius:8px;padding:8px;width:100%;font-size:12px;margin-top:6px;}
-.del-btn{background:transparent;border:1px solid var(--red);color:var(--red);border-radius:6px;width:34px;height:40px;font-size:16px;flex-shrink:0;}
+.del-btn{background:transparent;border:1px solid var(--red);color:var(--red);border-radius:6px;width:34px;height:38px;font-size:16px;flex-shrink:0;}
 .more-btn{background:transparent;border:1px dashed var(--muted);color:var(--muted);border-radius:6px;padding:4px 10px;font-size:11px;}
 
 /* MONTH NAV */
@@ -81,16 +73,9 @@ button:active{opacity:0.8;transform:scale(0.97);}
 .month-nav button{background:var(--card);color:var(--text);padding:10px 18px;border-radius:10px;border:1px solid var(--cardb);font-size:20px;line-height:1;}
 .month-name{flex:1;text-align:center;font-weight:700;font-size:20px;}
 
-/* VIAGGI */
-.viaggio-row{display:grid;grid-template-columns:1fr 90px 34px;gap:6px;margin-bottom:6px;align-items:center;}
-
 /* AUTH */
 .auth-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
 .auth-card{background:var(--card);border:1px solid var(--cardb);border-radius:18px;padding:28px 24px;width:100%;max-width:400px;}
-.auth-logo{text-align:center;margin-bottom:28px;}
-.auth-logo .logo-icon{width:56px;height:56px;font-size:26px;margin:0 auto 10px;}
-.auth-title{font-size:24px;font-weight:700;text-align:center;}
-.auth-sub{font-size:14px;color:var(--dim);text-align:center;margin-top:6px;}
 .form-group{margin-bottom:14px;}
 .form-label{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block;}
 .form-error{color:var(--red);font-size:13px;margin-top:8px;text-align:center;}
@@ -99,568 +84,528 @@ button:active{opacity:0.8;transform:scale(0.97);}
 
 /* SETUP */
 .setup-wrap{min-height:100vh;padding:24px;display:flex;flex-direction:column;gap:16px;max-width:500px;margin:0 auto;}
-.step-indicator{display:flex;gap:8px;justify-content:center;margin-bottom:8px;}
 .step-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);}
 .step-dot.active{background:var(--accent);}
-.member-chip{display:inline-flex;align-items:center;gap:6px;background:#090e1c;border:1px solid var(--cardb);border-radius:20px;padding:6px 12px;font-size:13px;margin:4px;}
-.member-chip button{background:transparent;color:var(--red);font-size:16px;line-height:1;padding:0 0 0 4px;}
-
-/* BAR CHART */
-.bar-chart{height:90px;display:flex;align-items:flex-end;gap:4px;padding:0 2px;}
-.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
-.bar{width:100%;border-radius:4px 4px 0 0;transition:height 0.4s;}
-.bar-val{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--dim);text-align:center;}
-.bar-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--muted);}
 
 /* LOADING */
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;}
 .spinner{width:36px;height:36px;border:3px solid var(--cardb);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
+
+/* CHART */
+.bar-chart{height:90px;display:flex;align-items:flex-end;gap:4px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.bar{width:100%;border-radius:4px 4px 0 0;}
+.bar-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--muted);}
 </style>
 </head>
 <body>
 <div id="root"></div>
-
 <script>
 const SUPABASE_URL = 'https://ldpkhtztfxqtiqfqoldx.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_lOJBbclb4ssQ7mJkhuBOlQ_gA4WINEI';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const MESI = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
-const DEFAULT_CATEGORIE = {
-  casa: ["Mutuo/Affitto","Telefono","Elettricità","Gas","Acqua","Manutenzione","Internet","Piatti"],
-  abbonamenti: ["Netflix","Google One","Spotify","iCloud"],
-  trasporti: ["Auto/Moto","Assicurazione","Benzina","Manutenzione"],
-  assicurazione: ["Casa","Salute","Vita"],
-  cibo: ["Spesa","Pranzi/Cene fuori"],
-  curaPers: ["Visite","Medicine","Prodotti","Vestiti","Palestra"],
-  investimenti: ["Trade Republic","IsyBank","Revolut"],
+const MESI = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const DEFAULT_CATS = {
+  casa:['Mutuo/Affitto','Telefono','Elettricità','Gas','Acqua','Manutenzione','Internet'],
+  abbonamenti:['Netflix','Google One','Spotify','iCloud'],
+  trasporti:['Assicurazione','Benzina','Manutenzione auto'],
+  assicurazione:['Casa','Salute','Vita'],
+  cibo:['Spesa','Pranzi/Cene fuori'],
+  curaPers:['Visite','Medicine','Prodotti','Vestiti','Palestra'],
+  investimenti:['Trade Republic','IsyBank','Revolut'],
 };
 const CAT_LABELS = {
-  casa:"🏠 Casa", abbonamenti:"📱 Abbonamenti", trasporti:"🚗 Trasporti",
-  assicurazione:"🛡️ Assicurazioni", cibo:"🍽️ Cibo", curaPers:"💊 Cura Personale",
-  investimenti:"📈 Investimenti"
+  casa:'🏠 Casa', abbonamenti:'📱 Abbonamenti', trasporti:'🚗 Trasporti',
+  assicurazione:'🛡️ Assicurazioni', cibo:'🍽️ Cibo', curaPers:'💊 Cura Personale',
+  investimenti:'📈 Investimenti'
 };
 
-// STATE
-let state = {
-  view: 'loading', // loading, auth, setup, app
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let S = {
+  view: 'loading',
   authMode: 'login',
   user: null,
   profile: null,
-  currentTab: 'mese',
-  currentMese: (() => { const n=new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`; })(),
-  meseData: null,
+  tab: 'mese',
+  meseKey: (function(){ const n=new Date(); return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0'); })(),
   allMesi: {},
   loading: false,
   error: '',
   setupStep: 1,
-  setupData: { membri: [''], conti: [{nome:'Revolut',colore:'#60a5fa'},{nome:'Trade Republic',colore:'#fbbf24'},{nome:'IsyBank',colore:'#a78bfa'}], categorieExtra: {} },
+  setup: { membri:[''], conti:[{nome:'Revolut',colore:'#60a5fa',principale:true},{nome:'Trade Republic',colore:'#fbbf24',principale:false},{nome:'IsyBank',colore:'#a78bfa',principale:false}] },
 };
 
-const fmt = n => (parseFloat(n)||0).toLocaleString("it-IT",{minimumFractionDigits:2,maximumFractionDigits:2})+" €";
-const fmtSign = n => { const v=parseFloat(n)||0; return (v>=0?"+":"")+v.toLocaleString("it-IT",{minimumFractionDigits:2,maximumFractionDigits:2})+" €"; };
-
-function render() {
-  const root = document.getElementById('root');
-  if (state.view === 'loading') { root.innerHTML = `<div class="loading"><div class="spinner"></div><div style="color:var(--dim);font-size:14px">Caricamento...</div></div>`; return; }
-  if (state.view === 'auth') { root.innerHTML = renderAuth(); return; }
-  if (state.view === 'setup') { root.innerHTML = renderSetup(); return; }
-  if (state.view === 'app') { root.innerHTML = renderApp(); return; }
-}
-
-// ── AUTH ──────────────────────────────────────────────────────────────────────
-function renderAuth() {
-  const isLogin = state.authMode === 'login';
-  return `<div class="auth-wrap fade">
-    <div class="auth-card">
-      <div class="auth-logo">
-        <div style="width:72px;height:72px;font-size:40px;margin:0 auto 12px;background:linear-gradient(135deg,var(--accent),#00b8d4);border-radius:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 24px var(--accentg);text-align:center;line-height:1">💰</div>
-        <div class="auth-title">Finance OS</div>
-        <div class="auth-sub">${isLogin ? 'Accedi al tuo account' : 'Crea il tuo account'}</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input type="email" id="auth-email" placeholder="la-tua@email.com" autocomplete="email">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input type="password" id="auth-pass" placeholder="••••••••" autocomplete="${isLogin?'current-password':'new-password'}">
-      </div>
-      ${state.error ? `<div class="form-error">${state.error}</div>` : ''}
-      <button class="btn btn-primary" style="margin-top:8px" onclick="doAuth()">${state.loading ? '...' : (isLogin ? 'Accedi' : 'Registrati')}</button>
-      <div class="auth-switch">
-        ${isLogin ? `Non hai un account? <a onclick="switchAuth('register')">Registrati</a>` : `Hai già un account? <a onclick="switchAuth('login')">Accedi</a>`}
-      </div>
-    </div>
-  </div>`;
-}
-
-function switchAuth(mode) { state.authMode = mode; state.error = ''; render(); }
-
-async function doAuth() {
-  const email = document.getElementById('auth-email').value.trim();
-  const pass = document.getElementById('auth-pass').value;
-  if (!email || !pass) { state.error = 'Inserisci email e password'; render(); return; }
-  state.loading = true; state.error = ''; render();
-  let res;
-  if (state.authMode === 'login') {
-    res = await sb.auth.signInWithPassword({ email, password: pass });
-  } else {
-    res = await sb.auth.signUp({ email, password: pass });
-  }
-  state.loading = false;
-  if (res.error) { state.error = res.error.message; render(); return; }
-  state.user = res.data.user;
-  await loadProfile();
-}
-
-// ── PROFILE ───────────────────────────────────────────────────────────────────
-async function loadProfile() {
-  const { data } = await sb.from('profiles').select('*').eq('id', state.user.id).single();
-  if (!data || !data.membri || data.membri.length === 0) {
-    state.view = 'setup'; state.setupStep = 1; render(); return;
-  }
-  state.profile = data;
-  await loadAllMesi();
-  state.view = 'app'; render();
-}
-
-async function loadAllMesi() {
-  const { data } = await sb.from('mesi').select('*').eq('user_id', state.user.id);
-  state.allMesi = {};
-  (data || []).forEach(r => { state.allMesi[r.mese_key] = r.dati; });
-}
-
-async function saveMese(key, dati) {
-  await sb.from('mesi').upsert({ user_id: state.user.id, mese_key: key, dati, updated_at: new Date().toISOString() }, { onConflict: 'user_id,mese_key' });
-  state.allMesi[key] = dati;
-}
-
-async function saveProfile(profileData) {
-  await sb.from('profiles').upsert({ id: state.user.id, ...profileData });
-  state.profile = { ...state.profile, ...profileData };
-}
-
-// ── SETUP ─────────────────────────────────────────────────────────────────────
-function renderSetup() {
-  const s = state.setupData;
-  const step = state.setupStep;
-  return `<div class="setup-wrap fade">
-    <div style="text-align:center">
-      <div style="width:64px;height:64px;font-size:36px;margin:0 auto 12px;background:linear-gradient(135deg,var(--accent),#00b8d4);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px var(--accentg);text-align:center;line-height:1">💰</div>
-      <div style="font-weight:700;font-size:20px">Configura il tuo profilo</div>
-      <div style="font-size:13px;color:var(--dim);margin-top:4px">Step ${step} di 2</div>
-    </div>
-    <div class="step-indicator">
-      <div class="step-dot ${step>=1?'active':''}"></div>
-      <div class="step-dot ${step>=2?'active':''}"></div>
-    </div>
-
-    ${step === 1 ? `
-    <div class="card">
-      <div class="card-title">👥 Chi usa questo account?</div>
-      <div style="font-size:13px;color:var(--dim);margin-bottom:14px">Inserisci i nomi delle persone che condividono l'account</div>
-      <div id="membri-list">
-        ${s.membri.map((m,i) => `
-          <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-            <input value="${m}" placeholder="Es: Andrea" id="membro-${i}" onblur="updateMembro(${i},this.value)" style="flex:1">
-            ${s.membri.length > 1 ? `<button class="del-btn" onclick="removeMembro(${i})">×</button>` : ''}
-          </div>`).join('')}
-      </div>
-      <button class="add-btn" onclick="addMembro()">+ Aggiungi persona</button>
-    </div>
-    <button class="btn btn-primary" onclick="setupNext()">Continua →</button>
-    ` : `
-    <div class="card">
-      <div class="card-title">🏦 I tuoi conti</div>
-      <div style="font-size:13px;color:var(--dim);margin-bottom:14px">Quali conti vuoi monitorare?</div>
-      <div id="conti-list">
-      <div style="font-size:12px;color:var(--dim);margin-bottom:10px">⭐ Tocca la stella per impostare il conto principale (quello da cui si calcolano le spese)</div>
-        ${s.conti.map((c,i) => `
-          <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-            <button onclick="setPrincipale(${i})" style="background:transparent;font-size:20px;padding:0;width:32px;flex-shrink:0;border:none">${c.principale ? '⭐' : '☆'}</button>
-            <input type="color" value="${c.colore}" onchange="updateConto(${i},'colore',this.value)" style="width:36px;height:36px;padding:3px;border-radius:8px;cursor:pointer;flex-shrink:0">
-            <input value="${c.nome}" placeholder="Nome conto" oninput="updateConto(${i},'nome',this.value)" style="flex:1">
-            ${s.conti.length > 1 ? `<button class="del-btn" onclick="removeConto(${i})">×</button>` : ''}
-          </div>`).join('')}
-      </div>
-      <button class="add-btn" onclick="addConto()">+ Aggiungi conto</button>
-    </div>
-    ${state.error ? `<div class="form-error">${state.error}</div>` : ''}
-    <button class="btn btn-primary" onclick="setupSave()">${state.loading ? 'Salvataggio...' : 'Inizia! 🚀'}</button>
-    <button class="btn btn-secondary" style="margin-top:8px" onclick="state.setupStep=1;render()">← Indietro</button>
-    `}
-    <button onclick="doLogout()" style="background:transparent;color:var(--muted);font-size:13px;text-align:center;padding:8px">Esci</button>
-  </div>`;
-}
-
-function updateMembro(i,v){state.setupData.membri[i]=v;render();}
-function addMembro(){state.setupData.membri.push('');render();}
-function removeMembro(i){state.setupData.membri.splice(i,1);render();}
-function updateConto(i,field,v){state.setupData.conti[i][field]=v;render();}
-function addConto(){state.setupData.conti.push({nome:'',colore:'#8892aa',principale:false});render();}
-function setPrincipale(i){state.setupData.conti.forEach((c,idx)=>{c.principale=idx===i;});render();}
-function removeConto(i){state.setupData.conti.splice(i,1);render();}
-
-function setupNext() {
-  const membri = state.setupData.membri.filter(m=>m.trim());
-  if (!membri.length) { alert('Inserisci almeno un nome'); return; }
-  state.setupData.membri = membri;
-  state.setupStep = 2; render();
-}
-
-async function setupSave() {
-  const conti = state.setupData.conti.filter(c=>c.nome.trim());
-  if (!conti.length) { state.error = 'Inserisci almeno un conto'; render(); return; }
-  // Ensure exactly one principale
-  const hasPrincipale = conti.some(c => c.principale);
-  if (!hasPrincipale) conti[0].principale = true;
-  state.loading = true; state.error = ''; render();
-  // Build categorie per membro
-  const categoriePersonali = {};
-  state.setupData.membri.forEach(m => { categoriePersonali[m] = []; });
-  const categorieFinali = { ...DEFAULT_CATEGORIE, ...categoriePersonali };
-  await saveProfile({ membri: state.setupData.membri, conti, categorie: categorieFinali });
-  state.loading = false;
-  await loadAllMesi();
-  state.view = 'app'; render();
-}
-
-// ── APP ───────────────────────────────────────────────────────────────────────
-function renderApp() {
-  const profile = state.profile;
-  const membri = profile.membri || [];
-  const nomi = membri.join(' & ');
-  return `<div id="app">
-    <div id="header">
-      <div class="header-inner">
-        <div class="logo">
-          <div class="logo-icon">💰</div>
-          <div><div class="logo-text">Finance OS</div><div class="logo-sub">${nomi}</div></div>
-        </div>
-        <button onclick="doLogout()" style="background:transparent;color:var(--muted);font-size:13px;padding:6px 10px;border-radius:8px;border:1px solid var(--cardb)">Esci</button>
-      </div>
-    </div>
-    <div id="content" style="flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch">
-      ${state.currentTab === 'mese' ? renderMese() : renderStorico()}
-    </div>
-    <div id="nav" style="display:flex;background:rgba(8,12,23,0.97);border-top:1px solid var(--cardb);flex-shrink:0;backdrop-filter:blur(12px)">
-      <button class="nav-btn ${state.currentTab==='mese'?'active':''}" onclick="switchTab('mese')"><span class="nav-icon">📅</span><span class="nav-label">MESE</span></button>
-      <button class="nav-btn ${state.currentTab==='storico'?'active':''}" onclick="switchTab('storico')"><span class="nav-icon">📊</span><span class="nav-label">STORICO</span></button>
-    </div>
-  </div>`;
-}
-
-function switchTab(tab) { state.currentTab = tab; render(); }
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const fmt = function(n){ return (parseFloat(n)||0).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; };
+const fmtSign = function(n){ var v=parseFloat(n)||0; return (v>=0?'+':'')+v.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; };
+const el = function(id){ return document.getElementById(id); };
+const h = function(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
 
 function getMeseData(key) {
-  if (!state.allMesi[key]) {
-    const profile = state.profile;
-    const spese = {};
-    const cats = profile.categorie || DEFAULT_CATEGORIE;
-    Object.entries(cats).forEach(([cat,voci]) => { spese[cat]={}; (voci||[]).forEach(v=>{spese[cat][v]="";}); });
-    // Spese personali per membro
-    (profile.membri||[]).forEach(m => { if(!spese[m])spese[m]={}; });
-    const contiChiusura = {};
-    (profile.conti||[]).forEach(c => { contiChiusura[c.nome]=""; });
-    const entrateObj = { altre: "" };
-    (profile.membri||[]).forEach(m => { entrateObj[m]=""; });
-    const soldiPresi = {};
-    (profile.membri||[]).forEach(m => { soldiPresi[m]=""; });
-    state.allMesi[key] = { entrate: entrateObj, soldiPresi, spese, viaggi: [], contiChiusura, note: "" };
+  if (!S.allMesi[key]) {
+    var spese = {};
+    var cats = (S.profile && S.profile.categorie) ? S.profile.categorie : DEFAULT_CATS;
+    Object.keys(cats).forEach(function(cat){ spese[cat]={}; (cats[cat]||[]).forEach(function(v){ spese[cat][v]=''; }); });
+    var membri = S.profile ? (S.profile.membri||[]) : [];
+    membri.forEach(function(m){ if(!spese[m]) spese[m]={}; });
+    S.allMesi[key] = { conti:{}, spese:{}, viaggi:[], note:'' };
+    S.allMesi[key].spese = spese;
   }
-  return state.allMesi[key];
+  return S.allMesi[key];
 }
 
-function sumCat(md,cat){ return Object.values(md.spese[cat]||{}).reduce((s,v)=>s+(parseFloat(v)||0),0); }
-function totUscite(md){
-  const cats = Object.keys(md.spese||{});
-  return cats.reduce((s,c)=>s+sumCat(md,c),0) + (md.viaggi||[]).reduce((s,v)=>s+(parseFloat(v.costo)||0),0);
+function calcPatrimonio(md) {
+  if (!S.profile) return 0;
+  var conti = S.profile.conti || [];
+  var cp = conti.find(function(c){ return c.principale; }) || conti[0];
+  if (!cp) return 0;
+  var membri = S.profile.membri || [];
+  var inizio = parseFloat(md.conti[cp.nome+'__inizio']) || 0;
+  var stipendi = membri.reduce(function(s,m){ return s+(parseFloat(md.conti[cp.nome+'__stip__'+m])||0); }, 0);
+  var prelevati = membri.reduce(function(s,m){ return s+(parseFloat(md.conti[cp.nome+'__prel__'+m])||0); }, 0);
+  var speseTot = calcSpese(md);
+  var saldoCP = inizio + stipendi - prelevati - speseTot;
+  var altriConti = conti.filter(function(c){ return !c.principale; }).reduce(function(s,c){ return s+(parseFloat(md.conti[c.nome])||0); }, 0);
+  return { saldoCP:saldoCP, altriConti:altriConti, tot:saldoCP+altriConti, stipendi:stipendi, prelevati:prelevati, speseTot:speseTot };
 }
-function totEntrate(md){ return Object.values(md.entrate||{}).reduce((s,v)=>s+(parseFloat(v)||0),0); }
-function totConti(md, profile) {
-  if (!profile) profile = state.profile;
-  const conti = profile?.conti || [];
-  const contoPrincipale = conti.find(c=>c.principale) || conti[0];
-  const tU = totUscite(md);
-  let tot = 0;
-  conti.forEach(c => {
-    if (c.principale) {
-      const inizio = parseFloat(md.contiChiusura?.[c.nome+'_inizio'])||0;
-      const prelevati = (profile?.membri||[]).reduce((s,m)=>s+(parseFloat(md.contiChiusura?.[c.nome+'_prelevati_'+m])||0),0);
-      const stipendi = (profile?.membri||[]).reduce((s,m)=>s+(parseFloat(md.contiChiusura?.[c.nome+'_stipendio_'+m])||0),0);
-      tot += inizio + stipendi - prelevati - tU;
-    } else {
-      tot += parseFloat(md.contiChiusura?.[c.nome])||0;
-    }
+
+function calcSpese(md) {
+  var tot = 0;
+  Object.keys(md.spese||{}).forEach(function(cat){
+    Object.keys(md.spese[cat]||{}).forEach(function(v){ tot += parseFloat(md.spese[cat][v])||0; });
   });
+  (md.viaggi||[]).forEach(function(v){ tot += parseFloat(v.costo)||0; });
   return tot;
 }
 
-// ── MESE VIEW ─────────────────────────────────────────────────────────────────
-function renderMese() {
-  const [y,m] = state.currentMese.split("-").map(Number);
-  const nomeMese = `${MESI[m-1]} ${y}`;
-  const md = getMeseData(state.currentMese);
-  const profile = state.profile;
-  const membri = profile.membri || [];
-  const conti = profile.conti || [];
-  const tE = totEntrate(md), tU = totUscite(md), saldo = tE-tU, tC = totConti(md, profile);
-
-  let html = `<div class="fade">`;
-  // Month nav
-  html += `<div class="month-nav">
-    <button onclick="prevMese()">‹</button>
-    <div class="month-name">${nomeMese}</div>
-    <button onclick="nextMese()">›</button>
-  </div>`;
-  // Stats
-  html += `<div class="stat-row">
-    <div class="stat"><div class="stat-label">Entrate</div><div class="stat-value" style="color:var(--accent)">${fmt(tE)}</div></div>
-    <div class="stat"><div class="stat-label">Uscite</div><div class="stat-value" style="color:var(--red)">${fmt(tU)}</div></div>
-  </div><div class="stat-row">
-    <div class="stat"><div class="stat-label">Saldo</div><div class="stat-value" style="color:${saldo>=0?'var(--accent)':'var(--red)'}">${fmtSign(saldo)}</div></div>
-    <div class="stat"><div class="stat-label">Patrimonio</div><div class="stat-value" style="color:var(--gold)">${fmt(tC)}</div></div>
-  </div>`;
-
-  // Entrate integrated in conto principale
-
-  // Soldi presi now integrated in conto principale section
-
-  // Chiusura conti
-  const contoPrincipale = conti.find(c=>c.principale) || conti[0];
-  const totPrelevati = (profile.membri||[]).reduce((s,m)=>s+(parseFloat(md.contiChiusura?.[contoPrincipale?.nome+'_prelevati_'+m])||0),0);
-  const totStipendi = (profile.membri||[]).reduce((s,m)=>s+(parseFloat(md.contiChiusura?.[contoPrincipale?.nome+'_stipendio_'+m])||0),0);
-  const saldoContoP = (parseFloat(md.contiChiusura?.[contoPrincipale?.nome+'_inizio'])||0) + totStipendi - totPrelevati - tU;
-
-  html += `<div class="card glow"><div class="card-title">🏦 Conti</div>`;
-
-  // Conto principale
-  html += `<div style="background:#090e1c;border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid ${contoPrincipale?.colore||'var(--accent)'}">
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
-      <div style="width:10px;height:10px;border-radius:50%;background:${contoPrincipale?.colore||'var(--accent)'}"></div>
-      <div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px">⭐ ${contoPrincipale?.nome||'Conto principale'}</div>
-    </div>
-    <div class="row" style="margin-bottom:10px">
-      <div class="row-label">💰 Cifra inizio mese</div>
-      <input type="number" value="${md.contiChiusura?.[contoPrincipale?.nome+'_inizio']||''}" placeholder="0" oninput="setConto('${contoPrincipale?.nome}_inizio',this.value)">
-    </div>
-    ${membri.map(function(m){var k=(contoPrincipale?contoPrincipale.nome:'')+'_stipendio_'+m;var v=md.contiChiusura&&md.contiChiusura[k]?md.contiChiusura[k]:'';return '<div class="row" style="margin-bottom:10px"><div class="row-label">💼 Stipendio '+m+'</div><input type="number" value="'+v+'" placeholder="0" oninput="setConto(\''+k+'\',this.value)"></div>';}).join('')}
-    ${membri.map(function(m){var k=(contoPrincipale?contoPrincipale.nome:'')+'_prelevati_'+m;var v=md.contiChiusura&&md.contiChiusura[k]?md.contiChiusura[k]:'';return '<div class="row" style="margin-bottom:10px"><div class="row-label">\uD83D\uDCB8 Prelevati '+m+'</div><input type="number" value="'+v+'" placeholder="0" oninput="setConto(\''+k+'\',this.value)"></div>';}).join('')}
-    <div style="height:1px;background:var(--cardb);margin:8px 0"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-      <span style="font-size:12px;color:var(--dim)">Stipendi entrati</span>
-      <span class="mono" style="font-size:13px;color:var(--accent)">+ ${fmt(totStipendi)}</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-      <span style="font-size:12px;color:var(--dim)">Prelevati</span>
-      <span class="mono" style="font-size:13px;color:var(--gold)">- ${fmt(totPrelevati)}</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <span style="font-size:12px;color:var(--dim)">Spese totali</span>
-      <span class="mono" style="font-size:13px;color:var(--red)">- ${fmt(tU)}</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <span style="font-size:13px;font-weight:700">Saldo stimato</span>
-      <span class="mono" style="font-size:16px;font-weight:700;color:${saldoContoP>=0?'var(--accent)':'var(--red)'}">${fmt(saldoContoP)}</span>
-    </div>
-  </div>`;
-
-  // Altri conti (escludi principale per nome E per flag)
-  conti.filter(c=>!c.principale && c.nome !== (contoPrincipale?.nome||'')).forEach(c => {
-    html += `<div style="display:grid;grid-template-columns:auto 1fr 100px;gap:8px;margin-bottom:10px;align-items:center">
-      <div style="width:10px;height:10px;border-radius:50%;background:${c.colore};flex-shrink:0"></div>
-      <div style="font-size:13px;color:var(--dim)">${c.nome}</div>
-      <input type="number" value="${md.contiChiusura?.[c.nome]||''}" placeholder="0" oninput="setConto('${c.nome}',this.value)">
-    </div>`;
-  });
-
-  html += `<div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--accent);margin-top:4px">
-    <span style="font-weight:700;font-size:15px">Patrimonio Totale</span>
-    <span class="mono" style="color:var(--accent);font-weight:700;font-size:18px">${fmt(tC)}</span>
-  </div></div>`;
-
-  // Categorie standard
-  const cats = profile.categorie || DEFAULT_CATEGORIE;
-  Object.entries(cats).forEach(([cat, voci]) => {
-    if (membri.includes(cat)) return; // skip personali per ora
-    const label = CAT_LABELS[cat] || ('📌 ' + cat);
-    const catVoci = Object.keys(md.spese?.[cat]||{}).length > (voci||[]).length ? Object.keys(md.spese[cat]) : (voci||[]);
-    const tot = catVoci.reduce((s,v)=>s+(parseFloat(md.spese?.[cat]?.[v])||0),0);
-    html += `<div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div class="card-title" style="margin-bottom:0">${label}</div>
-        <div class="mono" style="font-size:12px;color:${tot>0?'var(--gold)':'var(--muted)'}">${fmt(tot)}</div>
-      </div>`;
-    catVoci.forEach(v => {
-      html += `<div class="row"><div class="row-label">${v}</div><input type="number" value="${md.spese?.[cat]?.[v]||''}" placeholder="0" oninput="setSpesa('${cat}','${v}',this.value)"></div>`;
-    });
-    html += `<div style="display:flex;justify-content:flex-end;margin-top:6px"><button class="more-btn" onclick="addVoce('${cat}')">+ voce</button></div></div>`;
-  });
-
-  // Spese personali per membro
-  membri.forEach(membro => {
-    const catVoci = Object.keys(md.spese?.[membro]||{});
-    const tot = catVoci.reduce((s,v)=>s+(parseFloat(md.spese?.[membro]?.[v])||0),0);
-    html += `<div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div class="card-title" style="margin-bottom:0">👤 ${membro} — Personale</div>
-        <div class="mono" style="font-size:12px;color:${tot>0?'var(--gold)':'var(--muted)'}">${fmt(tot)}</div>
-      </div>`;
-    catVoci.forEach(v => {
-      html += `<div class="row"><div class="row-label">${v}</div><input type="number" value="${md.spese?.[membro]?.[v]||''}" placeholder="0" oninput="setSpesa('${membro}','${v}',this.value)"></div>`;
-    });
-    html += `<div style="display:flex;justify-content:flex-end;margin-top:6px"><button class="more-btn" onclick="addVoce('${membro}')">+ voce</button></div></div>`;
-  });
-
-  // Viaggi
-  const totV = (md.viaggi||[]).reduce((s,v)=>s+(parseFloat(v.costo)||0),0);
-  html += `<div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <div class="card-title" style="margin-bottom:0">✈️ Viaggi</div>
-      <div class="mono" style="font-size:12px;color:${totV>0?'var(--gold)':'var(--muted)'}">${fmt(totV)}</div>
-    </div>`;
-  (md.viaggi||[]).forEach((v,i) => {
-    html += `<div class="viaggio-row">
-      <input value="${v.nome||''}" placeholder="Destinazione" oninput="setViaggio(${i},'nome',this.value)" style="text-align:left;font-family:'Space Grotesk',sans-serif">
-      <input type="number" value="${v.costo||''}" placeholder="0" oninput="setViaggio(${i},'costo',this.value)">
-      <button class="del-btn" onclick="rmViaggio(${i})">×</button>
-    </div>`;
-  });
-  html += `<button class="add-btn" onclick="addViaggio()">+ Aggiungi viaggio</button></div>`;
-
-  // Note
-  html += `<div class="card"><div class="card-title">📝 Note</div>
-    <textarea rows="3" placeholder="Annotazioni per questo mese..." oninput="setNote(this.value)" style="resize:none;font-family:'Space Grotesk',sans-serif">${md.note||''}</textarea>
-  </div>`;
-
-  // Save indicator
-  html += `<div id="save-status" style="text-align:center;color:var(--muted);font-size:12px;padding:8px">I dati vengono salvati automaticamente ☁️</div>`;
-  html += `</div>`;
-  return html;
-}
-
-// ── STORICO ───────────────────────────────────────────────────────────────────
-function renderStorico() {
-  const entries = Object.entries(state.allMesi).sort((a,b)=>b[0].localeCompare(a[0]));
-  let html = `<div class="fade">`;
-  if (!entries.length) {
-    html += `<div style="text-align:center;padding:60px;color:var(--muted);font-size:15px">Nessun dato ancora.<br>Inizia dal tab Mese!</div>`;
-  } else {
-    const chartData = entries.slice().reverse().map(([key,md]) => ({key, tot:totConti(md)}));
-    if (chartData.length > 1) {
-      const maxV = Math.max(...chartData.map(d=>d.tot),1);
-      html += `<div class="card"><div class="card-title">📊 Andamento Patrimonio</div><div class="bar-chart">`;
-      chartData.forEach(({key,tot},i) => {
-        const h = Math.max((tot/maxV)*70,4);
-        const isLast = i===chartData.length-1;
-        const [y,m] = key.split("-").map(Number);
-        html += `<div class="bar-col">
-          <div class="bar-val">${tot>0?Math.round(tot/1000)+'k':''}</div>
-          <div class="bar" style="height:${h}px;background:${isLast?'var(--accent)':'var(--accentd)'}"></div>
-          <div class="bar-lbl">${String(m).padStart(2,'0')}/${String(y).slice(2)}</div>
-        </div>`;
-      });
-      html += `</div></div>`;
-    }
-    entries.forEach(([key,md]) => {
-      const tE=totEntrate(md), tU=totUscite(md), saldo=tE-tU, tC=totConti(md, state.profile);
-      const [y,m] = key.split("-").map(Number);
-      html += `<div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <div style="font-weight:700;font-size:16px">${MESI[m-1]} ${y}</div>
-          <div class="mono" style="color:${saldo>=0?'var(--accent)':'var(--red)'};font-size:14px;font-weight:600">${fmtSign(saldo)}</div>
-        </div>
-        <div class="stat-row">
-          <div class="stat"><div class="stat-label">Entrate</div><div class="stat-value" style="color:var(--accent)">${fmt(tE)}</div></div>
-          <div class="stat"><div class="stat-label">Uscite</div><div class="stat-value" style="color:var(--red)">${fmt(tU)}</div></div>
-          <div class="stat"><div class="stat-label">Patrimonio</div><div class="stat-value" style="color:var(--gold)">${fmt(tC)}</div></div>
-        </div>
-      </div>`;
-    });
+// ── SUPABASE ──────────────────────────────────────────────────────────────────
+async function loadProfile() {
+  var res = await sb.from('profiles').select('*').eq('id', S.user.id).single();
+  if (!res.data || !res.data.membri || res.data.membri.length === 0) {
+    S.view='setup'; S.setupStep=1; render(); return;
   }
-  html += `</div>`;
-  return html;
+  S.profile = res.data;
+  await loadAllMesi();
+  S.view='app'; render();
 }
 
-// ── MUTATORS ──────────────────────────────────────────────────────────────────
-let saveTimer = null;
+async function loadAllMesi() {
+  var res = await sb.from('mesi').select('*').eq('user_id', S.user.id);
+  S.allMesi = {};
+  (res.data||[]).forEach(function(r){ S.allMesi[r.mese_key] = r.dati; });
+}
+
+var saveTimer = null;
 function scheduleSave() {
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(async () => {
-    const el = document.getElementById('save-status');
-    if (el) el.textContent = 'Salvataggio...';
-    await saveMese(state.currentMese, state.allMesi[state.currentMese]);
-    if (el) el.textContent = 'Salvato ✓';
-    setTimeout(() => { if(el) el.textContent = 'I dati vengono salvati automaticamente ☁️'; }, 2000);
+  saveTimer = setTimeout(async function(){
+    var status = el('save-status');
+    if (status) status.textContent = 'Salvataggio...';
+    await sb.from('mesi').upsert({ user_id:S.user.id, mese_key:S.meseKey, dati:S.allMesi[S.meseKey], updated_at:new Date().toISOString() }, { onConflict:'user_id,mese_key' });
+    if (status) { status.textContent = 'Salvato ✓'; setTimeout(function(){ if(status) status.textContent='Dati salvati nel cloud ☁️'; },2000); }
   }, 800);
 }
 
-function setVal(section, key, val) { getMeseData(state.currentMese)[section][key]=val; scheduleSave(); }
-function setSoldi(key, val) { getMeseData(state.currentMese).soldiPresi[key]=val; scheduleSave(); }
-function setConto(key, val) { getMeseData(state.currentMese).contiChiusura[key]=val; scheduleSave(); updateStats(); }
-function setNote(val) { getMeseData(state.currentMese).note=val; scheduleSave(); }
-function setSpesa(cat,voce,val) {
-  const md=getMeseData(state.currentMese);
-  if(!md.spese[cat])md.spese[cat]={};
-  md.spese[cat][voce]=val;
-  scheduleSave(); updateStats();
+async function saveProfileData(data) {
+  await sb.from('profiles').upsert(Object.assign({ id: S.user.id }, data));
+  S.profile = Object.assign({}, S.profile, data);
+}
+
+// ── LIVE UPDATE (no re-render) ─────────────────────────────────────────────
+function liveUpdate() {
+  var md = getMeseData(S.meseKey);
+  var p = calcPatrimonio(md);
+  if (!p) return;
+  var set = function(id, val, color) {
+    var node = el(id);
+    if (node) { node.textContent = val; if(color) node.style.color = color; }
+  };
+  set('live-spese', fmt(p.speseTot));
+  set('live-patrimonio', fmt(p.tot), p.tot>=0?'var(--accent)':'var(--red)');
+  set('live-saldo-cp', fmt(p.saldoCP), p.saldoCP>=0?'var(--accent)':'var(--red)');
+  set('live-stipendi', '+ '+fmt(p.stipendi));
+  set('live-prelevati', '- '+fmt(p.prelevati));
+  set('live-spese-det', '- '+fmt(p.speseTot));
+  set('live-pat-bottom', fmt(p.tot));
+}
+
+// ── MUTATORS ──────────────────────────────────────────────────────────────────
+function setContoVal(key, val) {
+  var md = getMeseData(S.meseKey);
+  md.conti[key] = val;
+  liveUpdate(); scheduleSave();
+}
+function setSpesa(cat, voce, val) {
+  var md = getMeseData(S.meseKey);
+  if (!md.spese[cat]) md.spese[cat] = {};
+  md.spese[cat][voce] = val;
+  liveUpdate(); scheduleSave();
 }
 function addVoce(cat) {
-  const md=getMeseData(state.currentMese);
-  if(!md.spese[cat])md.spese[cat]={};
-  const n=`Voce ${Object.keys(md.spese[cat]).length+1}`;
-  md.spese[cat][n]="";
-  scheduleSave(); render();
-}
-function addViaggio(){getMeseData(state.currentMese).viaggi.push({nome:"",costo:""});scheduleSave();render();}
-function rmViaggio(i){getMeseData(state.currentMese).viaggi.splice(i,1);scheduleSave();render();}
-function setViaggio(i,field,val){getMeseData(state.currentMese).viaggi[i][field]=val;scheduleSave();}
-
-function updateStats() {
-  // Update just the stat boxes without full re-render
-  const md = getMeseData(state.currentMese);
-  const tE=totEntrate(md), tU=totUscite(md), saldo=tE-tU, tC=totConti(md, state.profile);
-  const stats = document.querySelectorAll('.stat-value');
-  if (stats[0]) stats[0].textContent = fmt(tE);
-  if (stats[1]) stats[1].textContent = fmt(tU);
-  if (stats[2]) { stats[2].textContent = fmtSign(saldo); stats[2].style.color = saldo>=0?'var(--accent)':'var(--red)'; }
-  if (stats[3]) stats[3].textContent = fmt(tC);
-}
-
-function prevMese(){
-  const [y,m]=state.currentMese.split("-").map(Number);
-  const d=new Date(y,m-2);
-  state.currentMese=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  var md = getMeseData(S.meseKey);
+  if (!md.spese[cat]) md.spese[cat] = {};
+  var n = 'Voce '+(Object.keys(md.spese[cat]).length+1);
+  md.spese[cat][n] = '';
   render();
 }
-function nextMese(){
-  const [y,m]=state.currentMese.split("-").map(Number);
-  const d=new Date(y,m);
-  state.currentMese=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  render();
+function addViaggio() { getMeseData(S.meseKey).viaggi.push({nome:'',costo:''}); render(); }
+function rmViaggio(i) { getMeseData(S.meseKey).viaggi.splice(i,1); liveUpdate(); scheduleSave(); render(); }
+function setViaggio(i, field, val) { getMeseData(S.meseKey).viaggi[i][field]=val; liveUpdate(); scheduleSave(); }
+function setNote(val) { getMeseData(S.meseKey).note=val; scheduleSave(); }
+
+function prevMese() {
+  var parts = S.meseKey.split('-'); var y=parseInt(parts[0]),m=parseInt(parts[1]);
+  var d = new Date(y,m-2); S.meseKey=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); render();
+}
+function nextMese() {
+  var parts = S.meseKey.split('-'); var y=parseInt(parts[0]),m=parseInt(parts[1]);
+  var d = new Date(y,m); S.meseKey=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); render();
 }
 
 async function doLogout() {
   await sb.auth.signOut();
-  state.user=null; state.profile=null; state.allMesi={};
-  state.view='auth'; state.authMode='login'; state.error='';
-  render();
+  S.user=null; S.profile=null; S.allMesi={}; S.view='auth'; S.authMode='login'; S.error=''; render();
+}
+
+// ── RENDER AUTH ───────────────────────────────────────────────────────────────
+function renderAuth() {
+  var isLogin = S.authMode==='login';
+  el('root').innerHTML = '<div class="auth-wrap fade">'
+    +'<div class="auth-card">'
+    +'<div style="text-align:center;margin-bottom:24px">'
+    +'<div style="width:72px;height:72px;background:linear-gradient(135deg,var(--accent),#00b8d4);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 12px;box-shadow:0 0 24px var(--accentg)">💰</div>'
+    +'<div style="font-weight:700;font-size:24px">Finance OS</div>'
+    +'<div style="font-size:14px;color:var(--dim);margin-top:4px">'+(isLogin?'Accedi al tuo account':'Crea il tuo account')+'</div>'
+    +'</div>'
+    +'<div class="form-group"><label class="form-label">Email</label><input type="email" id="auth-email" placeholder="la-tua@email.com"></div>'
+    +'<div class="form-group"><label class="form-label">Password</label><input type="password" id="auth-pass" placeholder="••••••••"></div>'
+    +(S.error?'<div class="form-error">'+h(S.error)+'</div>':'')
+    +'<button class="btn btn-primary" style="margin-top:8px" onclick="doAuth()">'+(S.loading?'...':isLogin?'Accedi':'Registrati')+'</button>'
+    +'<div class="auth-switch">'+(isLogin?'Non hai un account? <a onclick="switchAuth(\'register\')">Registrati</a>':'Hai già un account? <a onclick="switchAuth(\'login\')">Accedi</a>')+'</div>'
+    +'</div></div>';
+}
+
+function switchAuth(mode) { S.authMode=mode; S.error=''; renderAuth(); }
+
+async function doAuth() {
+  var email = el('auth-email').value.trim();
+  var pass = el('auth-pass').value;
+  if (!email||!pass) { S.error='Inserisci email e password'; renderAuth(); return; }
+  S.loading=true; S.error=''; renderAuth();
+  var res = S.authMode==='login'
+    ? await sb.auth.signInWithPassword({email:email,password:pass})
+    : await sb.auth.signUp({email:email,password:pass});
+  S.loading=false;
+  if (res.error) { S.error=res.error.message; renderAuth(); return; }
+  S.user = res.data.user;
+  await loadProfile();
+}
+
+// ── RENDER SETUP ──────────────────────────────────────────────────────────────
+function renderSetup() {
+  var s = S.setup;
+  var step = S.setupStep;
+  var html = '<div class="setup-wrap fade">'
+    +'<div style="text-align:center">'
+    +'<div style="width:64px;height:64px;background:linear-gradient(135deg,var(--accent),#00b8d4);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;box-shadow:0 0 18px var(--accentg)">💰</div>'
+    +'<div style="font-weight:700;font-size:20px">Configura il profilo</div>'
+    +'<div style="font-size:13px;color:var(--dim);margin-top:4px">Step '+step+' di 2</div>'
+    +'</div>'
+    +'<div style="display:flex;gap:8px;justify-content:center">'
+    +'<div class="step-dot'+(step>=1?' active':'')+'"></div>'
+    +'<div class="step-dot'+(step>=2?' active':'')+'"></div>'
+    +'</div>';
+
+  if (step===1) {
+    html += '<div class="card"><div class="card-title">👥 Chi usa questo account?</div>'
+      +'<div style="font-size:13px;color:var(--dim);margin-bottom:14px">Inserisci i nomi delle persone</div>';
+    s.membri.forEach(function(m,i){
+      html += '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">'
+        +'<input value="'+h(m)+'" placeholder="Es: Andrea" id="membro-'+i+'" onblur="updateMembro('+i+',this.value)" style="flex:1">'
+        +(s.membri.length>1?'<button class="del-btn" onclick="removeMembro('+i+')">×</button>':'')
+        +'</div>';
+    });
+    html += '<button class="add-btn" onclick="addMembro()">+ Aggiungi persona</button></div>';
+    html += '<button class="btn btn-primary" onclick="setupNext()">Continua →</button>';
+  } else {
+    html += '<div class="card"><div class="card-title">🏦 I tuoi conti</div>'
+      +'<div style="font-size:12px;color:var(--dim);margin-bottom:12px">⭐ = conto principale (saldo calcolato automaticamente)</div>';
+    s.conti.forEach(function(c,i){
+      html += '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">'
+        +'<button onclick="setPrincipale('+i+')" style="background:transparent;font-size:22px;padding:0;width:30px;flex-shrink:0;border:none">'+(c.principale?'⭐':'☆')+'</button>'
+        +'<input type="color" value="'+c.colore+'" onchange="updateConto('+i+',\'colore\',this.value)" style="width:36px;height:36px;padding:3px;border-radius:8px;cursor:pointer;flex-shrink:0;border:1px solid var(--cardb)">'
+        +'<input value="'+h(c.nome)+'" placeholder="Nome conto" id="conto-'+i+'" onblur="updateConto('+i+',\'nome\',this.value)" style="flex:1">'
+        +(s.conti.length>1?'<button class="del-btn" onclick="removeConto('+i+')">×</button>':'')
+        +'</div>';
+    });
+    html += '<button class="add-btn" onclick="addConto()">+ Aggiungi conto</button></div>';
+    if (S.error) html += '<div class="form-error">'+h(S.error)+'</div>';
+    html += '<button class="btn btn-primary" onclick="setupSave()">'+(S.loading?'Salvataggio...':'Inizia! 🚀')+'</button>';
+    html += '<button class="btn btn-secondary" style="margin-top:8px" onclick="S.setupStep=1;renderSetup()">← Indietro</button>';
+  }
+  html += '<button onclick="doLogout()" style="background:transparent;color:var(--muted);font-size:13px;text-align:center;padding:8px;border:none">Esci</button>';
+  html += '</div>';
+  el('root').innerHTML = html;
+}
+
+function updateMembro(i,v){ S.setup.membri[i]=v; }
+function addMembro(){ S.setup.membri.push(''); renderSetup(); }
+function removeMembro(i){ S.setup.membri.splice(i,1); renderSetup(); }
+function updateConto(i,field,v){ S.setup.conti[i][field]=v; if(field==='colore') renderSetup(); }
+function setPrincipale(i){ S.setup.conti.forEach(function(c,idx){ c.principale=idx===i; }); renderSetup(); }
+function addConto(){ S.setup.conti.push({nome:'',colore:'#8892aa',principale:false}); renderSetup(); }
+function removeConto(i){ S.setup.conti.splice(i,1); renderSetup(); }
+
+function setupNext() {
+  var membri = S.setup.membri.filter(function(m){ return m.trim(); });
+  if (!membri.length) { alert('Inserisci almeno un nome'); return; }
+  S.setup.membri = membri;
+  S.setupStep=2; renderSetup();
+}
+
+async function setupSave() {
+  var conti = S.setup.conti.filter(function(c){ return c.nome.trim(); });
+  if (!conti.length) { S.error='Inserisci almeno un conto'; renderSetup(); return; }
+  if (!conti.some(function(c){ return c.principale; })) conti[0].principale=true;
+  S.loading=true; S.error=''; renderSetup();
+  var cats = JSON.parse(JSON.stringify(DEFAULT_CATS));
+  S.setup.membri.forEach(function(m){ cats[m]=[]; });
+  await saveProfileData({ membri:S.setup.membri, conti:conti, categorie:cats });
+  S.loading=false;
+  await loadAllMesi();
+  S.view='app'; render();
+}
+
+// ── RENDER APP ────────────────────────────────────────────────────────────────
+function render() {
+  if (S.view==='loading') { el('root').innerHTML='<div class="loading"><div class="spinner"></div><div style="color:var(--dim);font-size:14px">Caricamento...</div></div>'; return; }
+  if (S.view==='auth') { renderAuth(); return; }
+  if (S.view==='setup') { renderSetup(); return; }
+  if (S.view==='app') { renderApp(); return; }
+}
+
+function renderApp() {
+  var p = S.profile;
+  var nomi = (p.membri||[]).join(' & ');
+  var tabHtml = S.tab==='mese' ? renderMese() : renderStorico();
+  el('root').innerHTML = '<div id="app">'
+    +'<div id="header"><div class="header-inner">'
+    +'<div class="logo"><div class="logo-icon">💰</div><div><div class="logo-text">Finance OS</div><div class="logo-sub">'+h(nomi)+'</div></div></div>'
+    +'<button onclick="doLogout()" style="background:transparent;color:var(--muted);font-size:13px;padding:6px 10px;border-radius:8px;border:1px solid var(--cardb)">Esci</button>'
+    +'</div></div>'
+    +'<div id="content">'+tabHtml+'</div>'
+    +'<div id="nav">'
+    +'<button class="nav-btn'+(S.tab==='mese'?' active':'')+'" onclick="switchTab(\'mese\')"><span class="nav-icon">📅</span><span class="nav-label">MESE</span></button>'
+    +'<button class="nav-btn'+(S.tab==='storico'?' active':'')+'" onclick="switchTab(\'storico\')"><span class="nav-icon">📊</span><span class="nav-label">STORICO</span></button>'
+    +'</div>'
+    +'</div>';
+}
+
+function switchTab(tab) { S.tab=tab; renderApp(); }
+
+// ── RENDER MESE ───────────────────────────────────────────────────────────────
+function renderMese() {
+  var parts = S.meseKey.split('-');
+  var nomeMese = MESI[parseInt(parts[1])-1]+' '+parts[0];
+  var md = getMeseData(S.meseKey);
+  var p = S.profile;
+  var conti = p.conti||[];
+  var membri = p.membri||[];
+  var cp = conti.find(function(c){ return c.principale; })||conti[0];
+  var calc = calcPatrimonio(md);
+  var cats = p.categorie || DEFAULT_CATS;
+
+  var html = '<div class="fade">';
+
+  // Month nav
+  html += '<div class="month-nav">'
+    +'<button onclick="prevMese()">‹</button>'
+    +'<div class="month-name">'+nomeMese+'</div>'
+    +'<button onclick="nextMese()">›</button>'
+    +'</div>';
+
+  // Stat boxes
+  html += '<div class="stat-row">'
+    +'<div class="stat"><div class="stat-label">Spese Totali</div><div class="stat-value" style="color:var(--red)" id="live-spese">'+fmt(calc.speseTot)+'</div></div>'
+    +'<div class="stat"><div class="stat-label">💎 Patrimonio</div><div class="stat-value" id="live-patrimonio" style="color:'+(calc.tot>=0?'var(--accent)':'var(--red)')+'">'+fmt(calc.tot)+'</div></div>'
+    +'</div>';
+
+  // Conto principale
+  if (cp) {
+    html += '<div class="card glow">'
+      +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">'
+      +'<div style="width:10px;height:10px;border-radius:50%;background:'+cp.colore+'"></div>'
+      +'<div class="card-title" style="margin-bottom:0">⭐ '+h(cp.nome)+'</div>'
+      +'</div>'
+      // Cifra iniziale
+      +'<div class="row"><div class="row-label">💰 Cifra inizio mese</div>'
+      +'<input type="number" value="'+(md.conti[cp.nome+'__inizio']||'')+'" placeholder="0" oninput="setContoVal(\''+cp.nome+'__inizio\',this.value)"></div>';
+
+    // Stipendi per membro
+    membri.forEach(function(m){
+      var k = cp.nome+'__stip__'+m;
+      html += '<div class="row"><div class="row-label">💼 Stipendio '+h(m)+'</div>'
+        +'<input type="number" value="'+(md.conti[k]||'')+'" placeholder="0" oninput="setContoVal(\''+k+'\',this.value)"></div>';
+    });
+
+    // Prelevati per membro
+    membri.forEach(function(m){
+      var k = cp.nome+'__prel__'+m;
+      html += '<div class="row"><div class="row-label">💸 Prelevati '+h(m)+'</div>'
+        +'<input type="number" value="'+(md.conti[k]||'')+'" placeholder="0" oninput="setContoVal(\''+k+'\',this.value)"></div>';
+    });
+
+    // Riepilogo calcolo
+    html += '<div class="divider"></div>'
+      +'<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--dim)">Stipendi</span><span class="mono" style="font-size:13px;color:var(--accent)" id="live-stipendi">+ '+fmt(calc.stipendi)+'</span></div>'
+      +'<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--dim)">Prelevati</span><span class="mono" style="font-size:13px;color:var(--gold)" id="live-prelevati">- '+fmt(calc.prelevati)+'</span></div>'
+      +'<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;color:var(--dim)">Spese totali</span><span class="mono" style="font-size:13px;color:var(--red)" id="live-spese-det">- '+fmt(calc.speseTot)+'</span></div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--accent)">'
+      +'<span style="font-weight:700">💰 Saldo '+h(cp.nome)+'</span>'
+      +'<span class="mono" style="font-size:18px;font-weight:700;color:'+(calc.saldoCP>=0?'var(--accent)':'var(--red)')+'" id="live-saldo-cp">'+fmt(calc.saldoCP)+'</span>'
+      +'</div></div>';
+  }
+
+  // Altri conti
+  var altriConti = conti.filter(function(c){ return !c.principale; });
+  if (altriConti.length) {
+    html += '<div class="card"><div class="card-title">🏦 Altri Conti</div>';
+    altriConti.forEach(function(c){
+      html += '<div style="display:grid;grid-template-columns:auto 1fr 105px;gap:8px;margin-bottom:10px;align-items:center">'
+        +'<div style="width:10px;height:10px;border-radius:50%;background:'+c.colore+'"></div>'
+        +'<div style="font-size:13px;color:var(--dim)">'+h(c.nome)+'</div>'
+        +'<input type="number" value="'+(md.conti[c.nome]||'')+'" placeholder="0" oninput="setContoVal(\''+c.nome+'\',this.value)">'
+        +'</div>';
+    });
+    html += '<div class="divider"></div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'
+      +'<span style="font-weight:700;font-size:15px">💎 Patrimonio Totale</span>'
+      +'<span class="mono" style="font-size:18px;font-weight:700;color:var(--accent)" id="live-pat-bottom">'+fmt(calc.tot)+'</span>'
+      +'</div></div>';
+  }
+
+  // Categorie spese
+  Object.keys(cats).forEach(function(cat){
+    if (membri.indexOf(cat)>=0) return; // skip personali qui
+    var label = CAT_LABELS[cat]||('📌 '+cat);
+    var voci = Object.keys(md.spese[cat]||{}).length > (cats[cat]||[]).length
+      ? Object.keys(md.spese[cat])
+      : (cats[cat]||[]);
+    var tot = voci.reduce(function(s,v){ return s+(parseFloat((md.spese[cat]||{})[v])||0); },0);
+    html += '<div class="card">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+      +'<div class="card-title" style="margin-bottom:0">'+label+'</div>'
+      +'<div class="mono" style="font-size:12px;color:'+(tot>0?'var(--gold)':'var(--muted)')+'">'+fmt(tot)+'</div>'
+      +'</div>';
+    voci.forEach(function(v){
+      html += '<div class="row"><div class="row-label">'+h(v)+'</div>'
+        +'<input type="number" value="'+((md.spese[cat]||{})[v]||'')+'" placeholder="0" oninput="setSpesa(\''+cat+'\',\''+v+'\',this.value)">'
+        +'</div>';
+    });
+    html += '<div style="display:flex;justify-content:flex-end;margin-top:6px"><button class="more-btn" onclick="addVoce(\''+cat+'\')">+ voce</button></div>';
+    html += '</div>';
+  });
+
+  // Spese personali per membro
+  membri.forEach(function(membro){
+    var voci = Object.keys((md.spese[membro])||{});
+    var tot = voci.reduce(function(s,v){ return s+(parseFloat((md.spese[membro]||{})[v])||0); },0);
+    html += '<div class="card">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+      +'<div class="card-title" style="margin-bottom:0">👤 '+h(membro)+' — Personale</div>'
+      +'<div class="mono" style="font-size:12px;color:'+(tot>0?'var(--gold)':'var(--muted)')+'">'+fmt(tot)+'</div>'
+      +'</div>';
+    voci.forEach(function(v){
+      html += '<div class="row"><div class="row-label">'+h(v)+'</div>'
+        +'<input type="number" value="'+((md.spese[membro]||{})[v]||'')+'" placeholder="0" oninput="setSpesa(\''+membro+'\',\''+v+'\',this.value)">'
+        +'</div>';
+    });
+    html += '<div style="display:flex;justify-content:flex-end;margin-top:6px"><button class="more-btn" onclick="addVoce(\''+membro+'\')">+ voce</button></div>';
+    html += '</div>';
+  });
+
+  // Viaggi
+  var totV = (md.viaggi||[]).reduce(function(s,v){ return s+(parseFloat(v.costo)||0); },0);
+  html += '<div class="card">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+    +'<div class="card-title" style="margin-bottom:0">✈️ Viaggi</div>'
+    +'<div class="mono" style="font-size:12px;color:'+(totV>0?'var(--gold)':'var(--muted)')+'">'+fmt(totV)+'</div>'
+    +'</div>';
+  (md.viaggi||[]).forEach(function(v,i){
+    html += '<div style="display:grid;grid-template-columns:1fr 95px 34px;gap:6px;margin-bottom:6px;align-items:center">'
+      +'<input value="'+h(v.nome||'')+'" placeholder="Destinazione" onblur="setViaggio('+i+',\'nome\',this.value)" style="text-align:left">'
+      +'<input type="number" value="'+(v.costo||'')+'" placeholder="0" oninput="setViaggio('+i+',\'costo\',this.value)">'
+      +'<button class="del-btn" onclick="rmViaggio('+i+')">×</button>'
+      +'</div>';
+  });
+  html += '<button class="add-btn" onclick="addViaggio()">+ Aggiungi viaggio</button></div>';
+
+  // Note
+  html += '<div class="card"><div class="card-title">📝 Note</div>'
+    +'<textarea rows="3" placeholder="Annotazioni..." onblur="setNote(this.value)" style="resize:none">'+h(md.note||'')+'</textarea></div>';
+
+  html += '<div id="save-status" style="text-align:center;color:var(--muted);font-size:12px;padding:8px 0 16px">Dati salvati nel cloud ☁️</div>';
+  html += '</div>';
+  return html;
+}
+
+// ── RENDER STORICO ────────────────────────────────────────────────────────────
+function renderStorico() {
+  var entries = Object.keys(S.allMesi).sort().reverse().map(function(k){ return [k, S.allMesi[k]]; });
+  var html = '<div class="fade">';
+  if (!entries.length) {
+    return html+'<div style="text-align:center;padding:60px;color:var(--muted)">Nessun dato ancora.<br>Inizia dal tab Mese!</div></div>';
+  }
+  var chartData = entries.slice().reverse().map(function(e){
+    var c = calcPatrimonio(e[1]);
+    return { key:e[0], tot:c?c.tot:0 };
+  });
+  if (chartData.length>1) {
+    var maxV = Math.max.apply(null, chartData.map(function(d){ return d.tot; }).concat([1]));
+    html += '<div class="card"><div class="card-title">📊 Andamento Patrimonio</div><div class="bar-chart">';
+    chartData.forEach(function(d,i){
+      var hpx = Math.max((d.tot/maxV)*70, 4);
+      var isLast = i===chartData.length-1;
+      var parts = d.key.split('-');
+      html += '<div class="bar-col">'
+        +'<div style="font-family:\'JetBrains Mono\',monospace;font-size:8px;color:var(--dim);text-align:center">'+(d.tot>0?Math.round(d.tot/1000)+'k':'')+'</div>'
+        +'<div class="bar" style="height:'+hpx+'px;background:'+(isLast?'var(--accent)':'var(--accentd)')+'"></div>'
+        +'<div class="bar-lbl">'+String(parts[1]).padStart(2,'0')+'/'+parts[0].slice(2)+'</div>'
+        +'</div>';
+    });
+    html += '</div></div>';
+  }
+  entries.forEach(function(e){
+    var key=e[0], md=e[1];
+    var c = calcPatrimonio(md);
+    var spese = c?c.speseTot:0;
+    var pat = c?c.tot:0;
+    var parts = key.split('-');
+    html += '<div class="card">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+      +'<div style="font-weight:700;font-size:16px">'+MESI[parseInt(parts[1])-1]+' '+parts[0]+'</div>'
+      +'<div class="mono" style="color:'+(pat>=0?'var(--accent)':'var(--red)')+';font-size:14px;font-weight:600">'+fmt(pat)+'</div>'
+      +'</div>'
+      +'<div class="stat-row">'
+      +'<div class="stat"><div class="stat-label">Spese</div><div class="stat-value" style="color:var(--red)">'+fmt(spese)+'</div></div>'
+      +'<div class="stat"><div class="stat-label">Patrimonio</div><div class="stat-value" style="color:var(--gold)">'+fmt(pat)+'</div></div>'
+      +'</div></div>';
+  });
+  html += '</div>';
+  return html;
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 async function init() {
   render();
-  const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) {
-    state.user = session.user;
+  var res = await sb.auth.getSession();
+  if (res.data && res.data.session && res.data.session.user) {
+    S.user = res.data.session.user;
     await loadProfile();
   } else {
-    state.view = 'auth'; render();
+    S.view='auth'; render();
   }
-  sb.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_OUT') { state.view='auth'; render(); }
-  });
 }
 
 init();
