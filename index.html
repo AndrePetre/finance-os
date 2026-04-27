@@ -275,9 +275,11 @@ function renderSetup() {
       <div class="card-title">🏦 I tuoi conti</div>
       <div style="font-size:13px;color:var(--dim);margin-bottom:14px">Quali conti vuoi monitorare?</div>
       <div id="conti-list">
+      <div style="font-size:12px;color:var(--dim);margin-bottom:10px">⭐ Tocca la stella per impostare il conto principale (quello da cui si calcolano le spese)</div>
         ${s.conti.map((c,i) => `
           <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-            <input type="color" value="${c.colore}" onchange="updateConto(${i},'colore',this.value)" style="width:40px;height:40px;padding:4px;border-radius:8px;cursor:pointer;flex-shrink:0">
+            <button onclick="setPrincipale(${i})" style="background:transparent;font-size:20px;padding:0;width:32px;flex-shrink:0;border:none">${c.principale ? '⭐' : '☆'}</button>
+            <input type="color" value="${c.colore}" onchange="updateConto(${i},'colore',this.value)" style="width:36px;height:36px;padding:3px;border-radius:8px;cursor:pointer;flex-shrink:0">
             <input value="${c.nome}" placeholder="Nome conto" oninput="updateConto(${i},'nome',this.value)" style="flex:1">
             ${s.conti.length > 1 ? `<button class="del-btn" onclick="removeConto(${i})">×</button>` : ''}
           </div>`).join('')}
@@ -296,7 +298,8 @@ function updateMembro(i,v){state.setupData.membri[i]=v;render();}
 function addMembro(){state.setupData.membri.push('');render();}
 function removeMembro(i){state.setupData.membri.splice(i,1);render();}
 function updateConto(i,field,v){state.setupData.conti[i][field]=v;render();}
-function addConto(){state.setupData.conti.push({nome:'',colore:'#8892aa'});render();}
+function addConto(){state.setupData.conti.push({nome:'',colore:'#8892aa',principale:false});render();}
+function setPrincipale(i){state.setupData.conti.forEach((c,idx)=>{c.principale=idx===i;});render();}
 function removeConto(i){state.setupData.conti.splice(i,1);render();}
 
 function setupNext() {
@@ -309,6 +312,9 @@ function setupNext() {
 async function setupSave() {
   const conti = state.setupData.conti.filter(c=>c.nome.trim());
   if (!conti.length) { state.error = 'Inserisci almeno un conto'; render(); return; }
+  // Ensure exactly one principale
+  const hasPrincipale = conti.some(c => c.principale);
+  if (!hasPrincipale) conti[0].principale = true;
   state.loading = true; state.error = ''; render();
   // Build categorie per membro
   const categoriePersonali = {};
@@ -372,7 +378,23 @@ function totUscite(md){
   return cats.reduce((s,c)=>s+sumCat(md,c),0) + (md.viaggi||[]).reduce((s,v)=>s+(parseFloat(v.costo)||0),0);
 }
 function totEntrate(md){ return Object.values(md.entrate||{}).reduce((s,v)=>s+(parseFloat(v)||0),0); }
-function totConti(md){ return Object.values(md.contiChiusura||{}).reduce((s,v)=>s+(parseFloat(v)||0),0); }
+function totConti(md, profile) {
+  if (!profile) profile = state.profile;
+  const conti = profile?.conti || [];
+  const contoPrincipale = conti.find(c=>c.principale) || conti[0];
+  const tU = totUscite(md);
+  let tot = 0;
+  conti.forEach(c => {
+    if (c.principale) {
+      const inizio = parseFloat(md.contiChiusura?.[c.nome+'_inizio'])||0;
+      const prelevati = parseFloat(md.contiChiusura?.[c.nome+'_prelevati'])||0;
+      tot += inizio - prelevati - tU;
+    } else {
+      tot += parseFloat(md.contiChiusura?.[c.nome])||0;
+    }
+  });
+  return tot;
+}
 
 // ── MESE VIEW ─────────────────────────────────────────────────────────────────
 function renderMese() {
@@ -382,7 +404,7 @@ function renderMese() {
   const profile = state.profile;
   const membri = profile.membri || [];
   const conti = profile.conti || [];
-  const tE = totEntrate(md), tU = totUscite(md), saldo = tE-tU, tC = totConti(md);
+  const tE = totEntrate(md), tU = totUscite(md), saldo = tE-tU, tC = totConti(md, profile);
 
   let html = `<div class="fade">`;
   // Month nav
@@ -400,30 +422,50 @@ function renderMese() {
     <div class="stat"><div class="stat-label">Patrimonio</div><div class="stat-value" style="color:var(--gold)">${fmt(tC)}</div></div>
   </div>`;
 
-  // Entrate
-  html += `<div class="card"><div class="card-title">💰 Entrate Mensili</div>`;
-  membri.forEach(m => {
-    html += `<div class="row"><div class="row-label">${m}</div><input type="number" value="${md.entrate?.[m]||''}" placeholder="0" oninput="setVal('entrate','${m}',this.value)"></div>`;
-  });
-  html += `<div class="row"><div class="row-label">Altre entrate</div><input type="number" value="${md.entrate?.altre||''}" placeholder="0" oninput="setVal('entrate','altre',this.value)"></div>`;
-  html += `<div class="total-row"><span style="color:var(--dim);font-size:13px">Totale</span><span class="mono" style="color:var(--accent);font-weight:600">${fmt(tE)}</span></div></div>`;
+  // Entrate integrated in conto principale
 
-  // Soldi presi
-  html += `<div class="card"><div class="card-title">💳 Soldi Presi dal Conto</div>`;
-  membri.forEach(m => {
-    html += `<div class="row"><div class="row-label">${m}</div><input type="number" value="${md.soldiPresi?.[m]||''}" placeholder="0" oninput="setSoldi('${m}',this.value)"></div>`;
-  });
-  html += `</div>`;
+  // Soldi presi now integrated in conto principale section
 
   // Chiusura conti
-  html += `<div class="card glow"><div class="card-title">🏦 Chiusura Conti del Mese</div>`;
-  conti.forEach(c => {
+  const contoPrincipale = conti.find(c=>c.principale) || conti[0];
+  const saldoContoP = (parseFloat(md.contiChiusura?.[contoPrincipale?.nome+'_inizio'])||0) - (parseFloat(md.contiChiusura?.[contoPrincipale?.nome+'_prelevati'])||0) - tU;
+
+  html += `<div class="card glow"><div class="card-title">🏦 Conti</div>`;
+
+  // Conto principale
+  html += `<div style="background:#090e1c;border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid ${contoPrincipale?.colore||'var(--accent)'}">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+      <div style="width:10px;height:10px;border-radius:50%;background:${contoPrincipale?.colore||'var(--accent)'}"></div>
+      <div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px">⭐ ${contoPrincipale?.nome||'Conto principale'}</div>
+    </div>
+    <div class="row" style="margin-bottom:10px">
+      <div class="row-label">💰 Cifra inizio mese</div>
+      <input type="number" value="${md.contiChiusura?.[contoPrincipale?.nome+'_inizio']||''}" placeholder="0" oninput="setConto('${contoPrincipale?.nome}_inizio',this.value)">
+    </div>
+    <div class="row" style="margin-bottom:10px">
+      <div class="row-label">💸 Soldi prelevati</div>
+      <input type="number" value="${md.contiChiusura?.[contoPrincipale?.nome+'_prelevati']||''}" placeholder="0" oninput="setConto('${contoPrincipale?.nome}_prelevati',this.value)">
+    </div>
+    <div style="height:1px;background:var(--cardb);margin:8px 0"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span style="font-size:12px;color:var(--dim)">Spese totali</span>
+      <span class="mono" style="font-size:13px;color:var(--red)">- ${fmt(tU)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:13px;font-weight:700">Saldo stimato</span>
+      <span class="mono" style="font-size:16px;font-weight:700;color:${saldoContoP>=0?'var(--accent)':'var(--red)'}">${fmt(saldoContoP)}</span>
+    </div>
+  </div>`;
+
+  // Altri conti
+  conti.filter(c=>!c.principale).forEach(c => {
     html += `<div style="display:grid;grid-template-columns:auto 1fr 100px;gap:8px;margin-bottom:10px;align-items:center">
       <div style="width:10px;height:10px;border-radius:50%;background:${c.colore};flex-shrink:0"></div>
       <div style="font-size:13px;color:var(--dim)">${c.nome}</div>
       <input type="number" value="${md.contiChiusura?.[c.nome]||''}" placeholder="0" oninput="setConto('${c.nome}',this.value)">
     </div>`;
   });
+
   html += `<div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--accent);margin-top:4px">
     <span style="font-weight:700;font-size:15px">Patrimonio Totale</span>
     <span class="mono" style="color:var(--accent);font-weight:700;font-size:18px">${fmt(tC)}</span>
@@ -513,7 +555,7 @@ function renderStorico() {
       html += `</div></div>`;
     }
     entries.forEach(([key,md]) => {
-      const tE=totEntrate(md), tU=totUscite(md), saldo=tE-tU, tC=totConti(md);
+      const tE=totEntrate(md), tU=totUscite(md), saldo=tE-tU, tC=totConti(md, state.profile);
       const [y,m] = key.split("-").map(Number);
       html += `<div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -569,7 +611,7 @@ function setViaggio(i,field,val){getMeseData(state.currentMese).viaggi[i][field]
 function updateStats() {
   // Update just the stat boxes without full re-render
   const md = getMeseData(state.currentMese);
-  const tE=totEntrate(md), tU=totUscite(md), saldo=tE-tU, tC=totConti(md);
+  const tE=totEntrate(md), tU=totUscite(md), saldo=tE-tU, tC=totConti(md, state.profile);
   const stats = document.querySelectorAll('.stat-value');
   if (stats[0]) stats[0].textContent = fmt(tE);
   if (stats[1]) stats[1].textContent = fmt(tU);
