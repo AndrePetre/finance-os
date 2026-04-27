@@ -443,11 +443,7 @@ function renderMese() {
       <div class="row-label">💰 Cifra inizio mese</div>
       <input type="number" value="${md.contiChiusura?.[contoPrincipale?.nome+'_inizio']||''}" placeholder="0" oninput="setConto('${contoPrincipale?.nome}_inizio',this.value)">
     </div>
-    ${membri.map(m => `
-    <div class="row" style="margin-bottom:10px">
-      <div class="row-label">💸 Prelevati ${m}</div>
-      <input type="number" value="${md.contiChiusura?.[contoPrincipale?.nome+'_prelevati_'+m]||''}" placeholder="0" oninput="setConto('${contoPrincipale?.nome}_prelevati_${m}',this.value)">
-    </div>`).join('')}
+    ${membri.map(function(m){var k=(contoPrincipale?contoPrincipale.nome:'')+'_prelevati_'+m;var v=md.contiChiusura&&md.contiChiusura[k]?md.contiChiusura[k]:'';return '<div class="row" style="margin-bottom:10px"><div class="row-label">\uD83D\uDCB8 Prelevati '+m+'</div><input type="number" value="'+v+'" placeholder="0" oninput="setConto(\''+k+'\',this.value)"></div>';}).join('')}
     <div style="height:1px;background:var(--cardb);margin:8px 0"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
       <span style="font-size:12px;color:var(--dim)">Spese totali</span>
