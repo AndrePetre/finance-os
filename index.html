@@ -388,7 +388,8 @@ function totConti(md, profile) {
     if (c.principale) {
       const inizio = parseFloat(md.contiChiusura?.[c.nome+'_inizio'])||0;
       const prelevati = (profile?.membri||[]).reduce((s,m)=>s+(parseFloat(md.contiChiusura?.[c.nome+'_prelevati_'+m])||0),0);
-      tot += inizio - prelevati - tU;
+      const stipendi = (profile?.membri||[]).reduce((s,m)=>s+(parseFloat(md.contiChiusura?.[c.nome+'_stipendio_'+m])||0),0);
+      tot += inizio + stipendi - prelevati - tU;
     } else {
       tot += parseFloat(md.contiChiusura?.[c.nome])||0;
     }
@@ -429,7 +430,8 @@ function renderMese() {
   // Chiusura conti
   const contoPrincipale = conti.find(c=>c.principale) || conti[0];
   const totPrelevati = (profile.membri||[]).reduce((s,m)=>s+(parseFloat(md.contiChiusura?.[contoPrincipale?.nome+'_prelevati_'+m])||0),0);
-  const saldoContoP = (parseFloat(md.contiChiusura?.[contoPrincipale?.nome+'_inizio'])||0) - totPrelevati - tU;
+  const totStipendi = (profile.membri||[]).reduce((s,m)=>s+(parseFloat(md.contiChiusura?.[contoPrincipale?.nome+'_stipendio_'+m])||0),0);
+  const saldoContoP = (parseFloat(md.contiChiusura?.[contoPrincipale?.nome+'_inizio'])||0) + totStipendi - totPrelevati - tU;
 
   html += `<div class="card glow"><div class="card-title">🏦 Conti</div>`;
 
@@ -443,8 +445,17 @@ function renderMese() {
       <div class="row-label">💰 Cifra inizio mese</div>
       <input type="number" value="${md.contiChiusura?.[contoPrincipale?.nome+'_inizio']||''}" placeholder="0" oninput="setConto('${contoPrincipale?.nome}_inizio',this.value)">
     </div>
+    ${membri.map(function(m){var k=(contoPrincipale?contoPrincipale.nome:'')+'_stipendio_'+m;var v=md.contiChiusura&&md.contiChiusura[k]?md.contiChiusura[k]:'';return '<div class="row" style="margin-bottom:10px"><div class="row-label">💼 Stipendio '+m+'</div><input type="number" value="'+v+'" placeholder="0" oninput="setConto(\''+k+'\',this.value)"></div>';}).join('')}
     ${membri.map(function(m){var k=(contoPrincipale?contoPrincipale.nome:'')+'_prelevati_'+m;var v=md.contiChiusura&&md.contiChiusura[k]?md.contiChiusura[k]:'';return '<div class="row" style="margin-bottom:10px"><div class="row-label">\uD83D\uDCB8 Prelevati '+m+'</div><input type="number" value="'+v+'" placeholder="0" oninput="setConto(\''+k+'\',this.value)"></div>';}).join('')}
     <div style="height:1px;background:var(--cardb);margin:8px 0"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <span style="font-size:12px;color:var(--dim)">Stipendi entrati</span>
+      <span class="mono" style="font-size:13px;color:var(--accent)">+ ${fmt(totStipendi)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <span style="font-size:12px;color:var(--dim)">Prelevati</span>
+      <span class="mono" style="font-size:13px;color:var(--gold)">- ${fmt(totPrelevati)}</span>
+    </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
       <span style="font-size:12px;color:var(--dim)">Spese totali</span>
       <span class="mono" style="font-size:13px;color:var(--red)">- ${fmt(tU)}</span>
