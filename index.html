@@ -387,7 +387,7 @@ function totConti(md, profile) {
   conti.forEach(c => {
     if (c.principale) {
       const inizio = parseFloat(md.contiChiusura?.[c.nome+'_inizio'])||0;
-      const prelevati = parseFloat(md.contiChiusura?.[c.nome+'_prelevati'])||0;
+      const prelevati = (profile?.membri||[]).reduce((s,m)=>s+(parseFloat(md.contiChiusura?.[c.nome+'_prelevati_'+m])||0),0);
       tot += inizio - prelevati - tU;
     } else {
       tot += parseFloat(md.contiChiusura?.[c.nome])||0;
@@ -428,7 +428,8 @@ function renderMese() {
 
   // Chiusura conti
   const contoPrincipale = conti.find(c=>c.principale) || conti[0];
-  const saldoContoP = (parseFloat(md.contiChiusura?.[contoPrincipale?.nome+'_inizio'])||0) - (parseFloat(md.contiChiusura?.[contoPrincipale?.nome+'_prelevati'])||0) - tU;
+  const totPrelevati = (profile.membri||[]).reduce((s,m)=>s+(parseFloat(md.contiChiusura?.[contoPrincipale?.nome+'_prelevati_'+m])||0),0);
+  const saldoContoP = (parseFloat(md.contiChiusura?.[contoPrincipale?.nome+'_inizio'])||0) - totPrelevati - tU;
 
   html += `<div class="card glow"><div class="card-title">🏦 Conti</div>`;
 
@@ -442,10 +443,11 @@ function renderMese() {
       <div class="row-label">💰 Cifra inizio mese</div>
       <input type="number" value="${md.contiChiusura?.[contoPrincipale?.nome+'_inizio']||''}" placeholder="0" oninput="setConto('${contoPrincipale?.nome}_inizio',this.value)">
     </div>
+    ${membri.map(m => `
     <div class="row" style="margin-bottom:10px">
-      <div class="row-label">💸 Soldi prelevati</div>
-      <input type="number" value="${md.contiChiusura?.[contoPrincipale?.nome+'_prelevati']||''}" placeholder="0" oninput="setConto('${contoPrincipale?.nome}_prelevati',this.value)">
-    </div>
+      <div class="row-label">💸 Prelevati ${m}</div>
+      <input type="number" value="${md.contiChiusura?.[contoPrincipale?.nome+'_prelevati_'+m]||''}" placeholder="0" oninput="setConto('${contoPrincipale?.nome}_prelevati_${m}',this.value)">
+    </div>`).join('')}
     <div style="height:1px;background:var(--cardb);margin:8px 0"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
       <span style="font-size:12px;color:var(--dim)">Spese totali</span>
