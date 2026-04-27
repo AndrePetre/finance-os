@@ -149,14 +149,17 @@ function getMeseData(key) {
     Object.keys(cats).forEach(function(cat){ spese[cat]={}; (cats[cat]||[]).forEach(function(v){ spese[cat][v]=''; }); });
     var membri = S.profile ? (S.profile.membri||[]) : [];
     membri.forEach(function(m){ if(!spese[m]) spese[m]={}; });
-    S.allMesi[key] = { conti:{}, spese:{}, viaggi:[], note:'' };
-    S.allMesi[key].spese = spese;
+    S.allMesi[key] = { conti:{}, spese:spese, viaggi:[], note:'' };
   }
   return S.allMesi[key];
 }
 
 function calcPatrimonio(md) {
   if (!S.profile) return 0;
+  if (!md) return 0;
+  if (!md.conti) md.conti = {};
+  if (!md.spese) md.spese = {};
+  if (!md.viaggi) md.viaggi = [];
   var conti = S.profile.conti || [];
   var cp = conti.find(function(c){ return c.principale; }) || conti[0];
   if (!cp) return 0;
@@ -193,7 +196,14 @@ async function loadProfile() {
 async function loadAllMesi() {
   var res = await sb.from('mesi').select('*').eq('user_id', S.user.id);
   S.allMesi = {};
-  (res.data||[]).forEach(function(r){ S.allMesi[r.mese_key] = r.dati; });
+  (res.data||[]).forEach(function(r){
+    var d = r.dati || {};
+    if (!d.conti) d.conti = {};
+    if (!d.spese) d.spese = {};
+    if (!d.viaggi) d.viaggi = [];
+    if (!d.note) d.note = '';
+    S.allMesi[r.mese_key] = d;
+  });
 }
 
 var saveTimer = null;
